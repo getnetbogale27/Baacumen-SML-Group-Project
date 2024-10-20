@@ -52,13 +52,8 @@ st.info(
 
 
 # Expanders for different data views
-# Capture the output of df.info()
-buffer = StringIO()
-df.info(buf=buffer)
-info_str = buffer.getvalue()
-
 with st.expander('🔍 Dataset Information'):
-    st.text(info_str)  
+    st.text(df.info)  
 
 with st.expander('🔢 Raw data (first 5 rows)'):
     st.write(df.head(5))  # Display first 5 rows of raw data
