@@ -287,6 +287,45 @@ with st.expander("Show Newly Created Features"):
 
 
 
+# Step 2: Exploratory Data Analysis (EDA) 
+# 2.1 Statistical Summaries
+
+# Selecting numerical columns based on the provided DataFrame structure
+numerical_columns = [
+    'age',
+    'days_since_last_login',
+    'avg_time_spent',
+    'avg_transaction_value',
+    'points_in_wallet',
+    'customer_tenure',
+    'login_frequency',
+    'avg_engagement_score',
+    'recency',
+    'engagement_score',
+    'points_utilization_rate',
+    'churn_history',
+    'offer_responsiveness'
+]
+
+# Calculate mean, median, and standard deviation
+summary_stats = {
+    'Mean': df[numerical_columns].mean(),
+    'Median': df[numerical_columns].median(),
+    'Standard Deviation': df[numerical_columns].std()
+}
+
+# Convert to DataFrame for better readability
+summary_stats_df = pd.DataFrame(summary_stats)
+
+# Streamlit expander to show summary statistics
+with st.expander("Show Statistical Summaries"):
+    st.dataframe(summary_stats_df)
+
+
+
+
+
+
 
 
 
