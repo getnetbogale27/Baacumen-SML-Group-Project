@@ -152,9 +152,12 @@ with st.expander('🔠 One-Hot Encoded Data Sample'):
     st.write(data_one_hot_encoded.head())
 
 
-# 1.4 Outlier Detection & Handling
 # Function to detect and handle outliers using IQR
 def detect_outliers_iqr(df, column):
+    if column not in df.columns:
+        print(f"Column {column} does not exist in the DataFrame.")
+        return df
+
     Q1 = df[column].quantile(0.25)
     Q3 = df[column].quantile(0.75)
     IQR = Q3 - Q1
@@ -171,14 +174,16 @@ def detect_outliers_iqr(df, column):
     
     # Handling outliers by capping
     df[column] = df[column].clip(lower=lower_bound, upper=upper_bound)
+    return df  # Return the modified DataFrame
 
 # Applying IQR method to specific columns
 columns_to_check = ['age', 'avg_time_spent', 'avg_transaction_value', 'points_in_wallet']
+df_before_handling = df.copy()  # Make a copy for comparison
 
 for col in columns_to_check:
-    detect_outliers_iqr(df, col)
+    df = detect_outliers_iqr(df, col)
 
-# Set up the matplotlib figure
+# Set up the matplotlib figure for the first set of boxplots
 fig, axs = plt.subplots(2, 2, figsize=(15, 10))
 
 # Create boxplots for Age
@@ -195,10 +200,9 @@ axs[1, 0].set_title('Boxplot of Average Time Spent (Before Handling)')
 sns.boxplot(x=df['avg_time_spent'], ax=axs[1, 1])
 axs[1, 1].set_title('Boxplot of Average Time Spent (After Handling)')
 
-# Show the plots in Streamlit
 plt.tight_layout()
 
-# Create expanders to display the data
+# Create expanders to display the data in Streamlit
 with st.expander('📊 Data Before Handling Outliers'):
     st.write(df_before_handling.describe())
 
@@ -225,13 +229,11 @@ axs[1, 0].set_title('Boxplot of Points in Wallet (Before Handling)')
 sns.boxplot(x=df['points_in_wallet'], ax=axs[1, 1])
 axs[1, 1].set_title('Boxplot of Points in Wallet (After Handling)')
 
-# Show the plots in Streamlit
 plt.tight_layout()
 
-# Create expanders for the second set of plots
+# Show the plots in Streamlit
 with st.expander('📊 Boxplots for Average Transaction Value and Points in Wallet'):
     st.pyplot(fig)
-
 
 
 
