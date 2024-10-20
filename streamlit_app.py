@@ -25,7 +25,11 @@ import scipy.stats as stats
 def load_data():
     url = 'https://raw.githubusercontent.com/getnetbogale27/Baacumen-SML-Group-Project/main/Dataset/train.csv'
     df = pd.read_csv(url)
-    return df
+    # Rename dataset to 'ML-Data'
+    ML_Data = df.copy()  
+    # Save the renamed dataset to a CSV file
+    ML_Data.to_csv('ML-Data.csv', index=False)
+    return ML_Data
 
 
 # Load the data
