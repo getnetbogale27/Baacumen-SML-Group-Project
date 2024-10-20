@@ -153,6 +153,9 @@ with st.expander('🔠 One-Hot Encoded Data Sample'):
 
 
 # 1.4 Outlier Detection & Handling
+# Capture the data before handling outliers
+df_before_handling = df.copy()
+
 # Function to detect and handle outliers using IQR
 def detect_outliers_iqr(df, column):
     Q1 = df[column].quantile(0.25)
@@ -178,32 +181,38 @@ columns_to_check = ['age', 'avg_time_spent', 'avg_transaction_value', 'points_in
 for col in columns_to_check:
     detect_outliers_iqr(df, col)
 
-# Check the data after handling outliers
-st.write("Data after handling outliers using IQR:")
-st.write(df[columns_to_check].describe())
-
-# Visualization: Boxplots for each numerical variable
-st.subheader('📊 Boxplots for Outlier Visualization')
-
 # Set up the matplotlib figure
 fig, axs = plt.subplots(2, 2, figsize=(15, 10))
 
 # Create boxplots for each numerical variable
-sns.boxplot(x=df['age'], ax=axs[0, 0])
-axs[0, 0].set_title('Boxplot of Age')
+sns.boxplot(x=df_before_handling['age'], ax=axs[0, 0])
+axs[0, 0].set_title('Boxplot of Age (Before Handling)')
 
-sns.boxplot(x=df['avg_time_spent'], ax=axs[0, 1])
-axs[0, 1].set_title('Boxplot of Average Time Spent')
+sns.boxplot(x=df['age'], ax=axs[0, 1])
+axs[0, 1].set_title('Boxplot of Age (After Handling)')
 
-sns.boxplot(x=df['avg_transaction_value'], ax=axs[1, 0])
-axs[1, 0].set_title('Boxplot of Average Transaction Value')
+sns.boxplot(x=df_before_handling['avg_time_spent'], ax=axs[1, 0])
+axs[1, 0].set_title('Boxplot of Average Time Spent (Before Handling)')
 
-sns.boxplot(x=df['points_in_wallet'], ax=axs[1, 1])
-axs[1, 1].set_title('Boxplot of Points in Wallet')
+sns.boxplot(x=df['avg_time_spent'], ax=axs[1, 1])
+axs[1, 1].set_title('Boxplot of Average Time Spent (After Handling)')
 
 # Show the plots in Streamlit
 plt.tight_layout()
-st.pyplot(fig)
+
+# Create expanders to display the data
+with st.expander('📊 Data Before Handling Outliers'):
+    st.write(df_before_handling.describe())
+
+with st.expander('📊 Data After Handling Outliers'):
+    st.write(df.describe())
+
+with st.expander('📊 Boxplots for Outlier Visualization'):
+    st.pyplot(fig)
+
+
+
+
 
 
 
