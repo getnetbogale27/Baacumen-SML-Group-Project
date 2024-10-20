@@ -197,6 +197,23 @@ axs[1, 0].set_title('Boxplot of Average Time Spent (Before Handling)')
 sns.boxplot(x=df['avg_time_spent'], ax=axs[1, 1])
 axs[1, 1].set_title('Boxplot of Average Time Spent (After Handling)')
 
+# Set up the second row for Average Transaction Value and Points in Wallet
+fig, axs = plt.subplots(2, 2, figsize=(15, 10))
+
+# Boxplots for Average Transaction Value
+sns.boxplot(x=df_before_handling['avg_transaction_value'], ax=axs[0, 0])
+axs[0, 0].set_title('Boxplot of Average Transaction Value (Before Handling)')
+
+sns.boxplot(x=df['avg_transaction_value'], ax=axs[0, 1])
+axs[0, 1].set_title('Boxplot of Average Transaction Value (After Handling)')
+
+# Boxplots for Points in Wallet
+sns.boxplot(x=df_before_handling['points_in_wallet'], ax=axs[1, 0])
+axs[1, 0].set_title('Boxplot of Points in Wallet (Before Handling)')
+
+sns.boxplot(x=df['points_in_wallet'], ax=axs[1, 1])
+axs[1, 1].set_title('Boxplot of Points in Wallet (After Handling)')
+
 # Show the plots in Streamlit
 plt.tight_layout()
 
@@ -209,7 +226,6 @@ with st.expander('📊 Data After Handling Outliers'):
 
 with st.expander('📊 Boxplots for Outlier Visualization'):
     st.pyplot(fig)
-
 
 
 
