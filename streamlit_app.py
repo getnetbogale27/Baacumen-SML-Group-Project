@@ -54,25 +54,22 @@ st.info(
 
 # Expanders for different data views
 with st.expander('🔍 Dataset Information'):
-    # Create a buffer to capture the output of df.info()
     buffer = StringIO()
     df.info(buf=buffer)
-    # Get the string from the buffer
     s = buffer.getvalue()
-    # Display the dataset info in the Streamlit app
     st.text(s)
 
 with st.expander('🔢 Raw data (first 5 rows)'):
     st.write(df.head(5))  # Display first 5 rows of raw data
 
 with st.expander('🧩 X (independent variables) (first 5 rows)'):
-    X_raw = df.iloc[:, 3:-1]
-    st.write(X_raw.head(5))  # Display first 5 rows of independent variables
+    X_raw = df.iloc[:, 2:-1]  # Adjusted to start from the 3rd column (index 2)
+    st.write(X_raw.head(5)) 
 
 with st.expander('🎯 Y (dependent variable) (first 5 rows)'):
-    y_raw = df.iloc[:, -1]
-    # Display first 5 rows of dependent variable
+    y_raw = df.iloc[:, -1]  
     st.write(y_raw.head(5).reset_index(drop=True))
+
 
 
 # Sidebar inputs
