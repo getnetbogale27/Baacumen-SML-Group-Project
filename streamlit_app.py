@@ -209,32 +209,29 @@ with st.expander('📊 Data Before Handling Outliers'):
 with st.expander('📊 Data After Handling Outliers'):
     st.write(df.describe())
 
-with st.expander('📊 Boxplots for Outlier Visualization'):
-    st.pyplot(fig)
-
-# Set up the second row for Average Transaction Value and Points in Wallet
-fig, axs = plt.subplots(2, 2, figsize=(15, 10))
+# Combine boxplots for Age, Average Time Spent, Average Transaction Value, and Points in Wallet
+fig2, axs2 = plt.subplots(2, 2, figsize=(15, 10))
 
 # Boxplots for Average Transaction Value
-sns.boxplot(x=df_before_handling['avg_transaction_value'], ax=axs[0, 0])
-axs[0, 0].set_title('Boxplot of Average Transaction Value (Before Handling)')
+sns.boxplot(x=df_before_handling['avg_transaction_value'], ax=axs2[0, 0])
+axs2[0, 0].set_title('Boxplot of Average Transaction Value (Before Handling)')
 
-sns.boxplot(x=df['avg_transaction_value'], ax=axs[0, 1])
-axs[0, 1].set_title('Boxplot of Average Transaction Value (After Handling)')
+sns.boxplot(x=df['avg_transaction_value'], ax=axs2[0, 1])
+axs2[0, 1].set_title('Boxplot of Average Transaction Value (After Handling)')
 
 # Boxplots for Points in Wallet
-sns.boxplot(x=df_before_handling['points_in_wallet'], ax=axs[1, 0])
-axs[1, 0].set_title('Boxplot of Points in Wallet (Before Handling)')
+sns.boxplot(x=df_before_handling['points_in_wallet'], ax=axs2[1, 0])
+axs2[1, 0].set_title('Boxplot of Points in Wallet (Before Handling)')
 
-sns.boxplot(x=df['points_in_wallet'], ax=axs[1, 1])
-axs[1, 1].set_title('Boxplot of Points in Wallet (After Handling)')
+sns.boxplot(x=df['points_in_wallet'], ax=axs2[1, 1])
+axs2[1, 1].set_title('Boxplot of Points in Wallet (After Handling)')
 
 plt.tight_layout()
 
-# Show the plots in Streamlit
-with st.expander('📊 Boxplots for Average Transaction Value and Points in Wallet'):
+# Create a single expander for all boxplots
+with st.expander('📊 Boxplots for Outlier Visualization and Handling'):
     st.pyplot(fig)
-
+    st.pyplot(fig2)
 
 
 
