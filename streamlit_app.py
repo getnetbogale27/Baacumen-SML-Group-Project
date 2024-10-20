@@ -155,8 +155,8 @@ with st.expander('🔠 One-Hot Encoded Data Sample'):
 # 1.4 Outlier Detection & Handling
 # Function to detect and handle outliers using IQR
 def detect_outliers_iqr(data, column):
-    Q1 = data[column].quantile(0.25)
-    Q3 = data[column].quantile(0.75)
+    Q1 = df[column].quantile(0.25)
+    Q3 = df[column].quantile(0.75)
     IQR = Q3 - Q1
     
     # Define bounds for outliers
@@ -164,13 +164,13 @@ def detect_outliers_iqr(data, column):
     upper_bound = Q3 + 1.5 * IQR
     
     # Identify outliers
-    outliers = data[(data[column] < lower_bound) | (data[column] > upper_bound)]
+    outliers = df[(df[column] < lower_bound) | (df[column] > upper_bound)]
     
     # Print detected outliers in the console (optional)
     print(f"Detected outliers in {column}:\n", outliers)
     
     # Handling outliers by capping
-    data[column] = data[column].clip(lower=lower_bound, upper=upper_bound)
+    df[column] = df[column].clip(lower=lower_bound, upper=upper_bound)
 
 # Applying IQR method to specific columns
 columns_to_check = ['age', 'avg_time_spent', 'avg_transaction_value', 'points_in_wallet']
@@ -180,7 +180,7 @@ for col in columns_to_check:
 
 # Check the data after handling outliers
 st.write("Data after handling outliers using IQR:")
-st.write(data[columns_to_check].describe())
+st.write(df[columns_to_check].describe())
 
 # Visualization: Boxplots for each numerical variable
 st.subheader('📊 Boxplots for Outlier Visualization')
@@ -189,16 +189,16 @@ st.subheader('📊 Boxplots for Outlier Visualization')
 fig, axs = plt.subplots(2, 2, figsize=(15, 10))
 
 # Create boxplots for each numerical variable
-sns.boxplot(x=data['age'], ax=axs[0, 0])
+sns.boxplot(x=df['age'], ax=axs[0, 0])
 axs[0, 0].set_title('Boxplot of Age')
 
-sns.boxplot(x=data['avg_time_spent'], ax=axs[0, 1])
+sns.boxplot(x=df['avg_time_spent'], ax=axs[0, 1])
 axs[0, 1].set_title('Boxplot of Average Time Spent')
 
-sns.boxplot(x=data['avg_transaction_value'], ax=axs[1, 0])
+sns.boxplot(x=df['avg_transaction_value'], ax=axs[1, 0])
 axs[1, 0].set_title('Boxplot of Average Transaction Value')
 
-sns.boxplot(x=data['points_in_wallet'], ax=axs[1, 1])
+sns.boxplot(x=df['points_in_wallet'], ax=axs[1, 1])
 axs[1, 1].set_title('Boxplot of Points in Wallet')
 
 # Show the plots in Streamlit
