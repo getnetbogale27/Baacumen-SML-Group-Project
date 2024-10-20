@@ -103,7 +103,7 @@ with st.sidebar:
 
     # Slider for last visit time (in minutes)
     last_visit_minutes = st.slider(
-        'Last Visit Time', min_value=0, max_value=24 * 60 - 1, value=12 * 60, step=1
+        'Last Visit Time in Minute', min_value=0, max_value=24 * 60 - 1, value=12 * 60, step=1
     )
     last_visit_time = minutes_to_time(last_visit_minutes)
 
