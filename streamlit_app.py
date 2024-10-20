@@ -122,6 +122,25 @@ with st.expander('✅ Missing Data Summary (After Imputation)'):
     st.write(df.isnull().sum())
 
 
+# 1.2 Data Type Correction
+## 1.2 Data Type Correction
+
+# Step 1: Convert 'joining_date' and 'last_visit_time' to datetime format
+df['joining_date'] = pd.to_datetime(df['joining_date'], errors='coerce')
+df['last_visit_time'] = pd.to_datetime(df['last_visit_time'], errors='coerce')
+df['churn_risk_score'] = df['churn_risk_score'].astype('category')
+
+# Step 2: Capture data types after correction
+data_types_after_correction = df.dtypes
+
+# Expander: Display data types after correction
+with st.expander('🛠️ Data Types After Correction'):
+    st.write(data_types_after_correction)
+
+
+
+
+
 
 
 
