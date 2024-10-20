@@ -95,7 +95,8 @@ with st.sidebar:
     medium_of_operation = st.selectbox('Medium of Operation', ['Both', 'Desktop', 'Smartphone'], index=0)
     internet_option = st.selectbox('Internet Option', ['Wi-Fi', 'Mobile_Data', 'Fiber_Optic'], index=0)
 
-    last_visit_time = st.slider('Last Visit Time', 0.0, 24.0, 12.0, step=0.01, format="%02.0f:%02.0f")
+    # Using time_input instead of slider for time selection
+    last_visit_time = st.time_input('Last Visit Time', value=pd.Timestamp('12:00:00').time())
 
     days_since_last_login = st.slider('Days Since Last Login', 1, 26, 13, step=1)
     avg_time_spent = st.slider('Average Time Spent', -2096.58, 2732.70, 0.0, step=0.01)
