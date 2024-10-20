@@ -325,7 +325,7 @@ import scipy.stats as stats
 
 @st.cache_data
 def load_data():
-    url = 'https://raw.githubusercontent.com/getnetbogale27/Child-Undernutrition-ML-app/refs/heads/master/data/ML-Data.csv?token=GHSAT0AAAAAACY5XTINZM2YD7A7H47DSQ3IZYTUMRQ'
+    url = 'https://raw.githubusercontent.com/getnetbogale27/Child-Undernutrition-ML-app/refs/heads/master/data/ML-Data.csv?token=GHSAT0AAAAAACY5XTIM2JABHYUASMZWHMVEZYU3WTA'
     df = pd.read_csv(url)
     return df
 
