@@ -238,14 +238,10 @@ with st.expander('📊 Boxplots for Outlier Visualization and Handling'):
 # Feature Engineering
 df['recency'] = df['days_since_last_login']  # Days since last login
 
-# Check for necessary columns before performing calculations
-if 'avg_transaction_value' not in df.columns or 'transaction_frequency' not in df.columns:
-    st.error("Columns 'avg_transaction_value' or 'transaction_frequency' not found in our DataFrame.")
-else:
-    # Calculate Monetary Value
-    df['monetary_value'] = df['avg_transaction_value'] * df['transaction_frequency']  # Total monetary value
-    # Calculate Average Order Value (AOV)
-    df['average_order_value'] = df['monetary_value'] / (df['transaction_frequency'] + 1)  # AOV safeguard
+# Calculate Monetary Value
+df['monetary_value'] = df['avg_transaction_value'] * df['transaction_frequency']  # Total monetary value
+# Calculate Average Order Value (AOV)
+df['average_order_value'] = df['monetary_value'] / (df['transaction_frequency'] + 1)  # AOV safeguard
 
 # Calculate Engagement Score
 df['engagement_score'] = (df['avg_time_spent'] * 0.5 + (1 / (df['days_since_last_login'] + 1)) * 0.5)
