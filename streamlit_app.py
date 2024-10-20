@@ -72,6 +72,12 @@ with st.expander('🎯 Y (dependent variable) (first 5 rows)'):
 
 
 
+# function to convert minutes to HH:MM:SS format
+def minutes_to_time(minutes):
+    hours = minutes // 60
+    mins = minutes % 60
+    return f"{int(hours):02}:{int(mins):02}:00"
+
 # Sidebar for input features
 with st.sidebar:
     st.header('Input Features')
@@ -95,8 +101,11 @@ with st.sidebar:
     medium_of_operation = st.selectbox('Medium of Operation', ['Both', 'Desktop', 'Smartphone'], index=0)
     internet_option = st.selectbox('Internet Option', ['Wi-Fi', 'Mobile_Data', 'Fiber_Optic'], index=0)
 
-    # Using time_input instead of slider for time selection
-    last_visit_time = st.time_input('Last Visit Time', value=pd.Timestamp('12:00:00').time())
+    # Slider for last visit time (in minutes)
+    last_visit_minutes = st.slider(
+        'Last Visit Time', min_value=0, max_value=24 * 60 - 1, value=12 * 60, step=1
+    )
+    last_visit_time = minutes_to_time(last_visit_minutes)
 
     days_since_last_login = st.slider('Days Since Last Login', 1, 26, 13, step=1)
     avg_time_spent = st.slider('Average Time Spent', -2096.58, 2732.70, 0.0, step=0.01)
