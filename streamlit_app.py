@@ -53,7 +53,13 @@ st.info(
 
 # Expanders for different data views
 with st.expander('🔍 Dataset Information'):
-    st.text(df.info)  
+    # Create a buffer to capture the output of df.info()
+    buffer = StringIO()
+    df.info(buf=buffer)
+    # Get the string from the buffer
+    s = buffer.getvalue()
+    # Display the dataset info in the Streamlit app
+    st.text(s)
 
 with st.expander('🔢 Raw data (first 5 rows)'):
     st.write(df.head(5))  # Display first 5 rows of raw data
