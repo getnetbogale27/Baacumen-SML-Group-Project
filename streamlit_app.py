@@ -322,6 +322,184 @@ with st.expander("Show Statistical Summaries"):
     st.dataframe(summary_stats_df)
 
 
+# 2.2 Visualizations
+# Set the style of seaborn
+sns.set(style="whitegrid")
+
+# Function to plot data
+def plot_data(df, columns, plot_type='count'):
+    num_columns = 3 if plot_type != 'bar' else 4
+    num_rows = (len(columns) + num_columns - 1) // num_columns
+    fig, axes = plt.subplots(num_rows, num_columns, figsize=(15, 5 * num_rows))
+    axes = axes.flatten()
+
+    for idx, column in enumerate(columns):
+        if plot_type == 'count':
+            sns.countplot(df[column], ax=axes[idx], order=df[column].value_counts().index)
+            axes[idx].set_title(f'Count of {column}')
+            axes[idx].set_xticklabels(axes[idx].get_xticklabels(), rotation=45)
+        elif plot_type == 'hist':
+            sns.histplot(df[column], bins=30, kde=True, ax=axes[idx])
+            axes[idx].set_title(f'Histogram of {column}')
+            axes[idx].set_xlabel(column)
+            axes[idx].set_ylabel('Frequency')
+        elif plot_type == 'box':
+            sns.boxplot(y=df[column], ax=axes[idx])
+            axes[idx].set_title(f'Box Plot of {column}')
+
+    for j in range(idx + 1, len(axes)):
+        fig.delaxes(axes[j])
+
+    plt.tight_layout()
+    st.pyplot(fig)  # Use Streamlit's pyplot
+
+# Load your data
+# df = pd.read_csv('your_data.csv')  # Replace with your actual data source
+
+# List of categorical columns
+categorical_columns = [
+    'gender', 
+    'region_category', 
+    'membership_category', 
+    'preferred_offer_types', 
+    'tenure_category', 
+    'joined_through_referral', 
+    'used_special_discount', 
+    'offer_application_preference', 
+    'past_complaint', 
+    'complaint_status', 
+    'churn_risk_score'
+]
+
+# List of numerical columns
+numerical_columns = [
+    'age', 
+    'avg_time_spent', 
+    'avg_transaction_value', 
+    'points_in_wallet', 
+    'customer_tenure', 
+    'is_active', 
+    'login_frequency', 
+    'avg_engagement_score', 
+    'recency', 
+    'engagement_score', 
+    'churn_history', 
+    'points_utilization_rate', 
+    'offer_responsiveness'
+]
+
+# Create a single expander for all visualizations
+with st.expander("Data Visualizations", expanded=True):
+    # Categorical Visualizations
+    st.subheader("Categorical Visualizations")
+    plot_data(df, categorical_columns, plot_type='count')
+
+    # Numerical Visualizations: Histograms
+    st.subheader("Numerical Visualizations: Histograms")
+    plot_data(df, numerical_columns, plot_type='hist')
+
+    # Numerical Visualizations: Box plots
+    st.subheader("Numerical Visualizations: Box Plots")
+    plot_data(df, numerical_columns, plot_type='box')
+
+    # Pair Plot
+    st.subheader("Pair Plot of Numerical Features")
+    fig = sns.pairplot(df[numerical_columns])
+    st.pyplot(fig)
+
+    # Correlation Heatmap
+    st.subheader("Correlation Heatmap")
+    plt.figure(figsize=(12, 10))
+    correlation_matrix = df[numerical_columns].corr()
+    sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm', square=True)
+    plt.title('Correlation Heatmap of Numerical Features')
+    st.pyplot()
+
+
+
+# Outlier Detection and treat for newly computed features
+# Run outlier detection first
+detect_outliers_iqr(df, numerical_columns)
+
+# Create an expander for boxplot visualization
+with st.expander("Treating Outlier for newly computed features"):
+    # Set up the matplotlib figure
+    plt.figure(figsize=(15, 10))
+    
+    # Create subplots for each numerical variable
+    num_columns = 2  # Number of columns in the subplot grid
+    num_rows = (len(numerical_columns) + num_columns - 1) // num_columns  # Calculate number of rows needed
+    
+    for idx, column in enumerate(numerical_columns):
+        plt.subplot(num_rows, num_columns, idx + 1)  # Subplot indexing starts at 1
+        sns.boxplot(x=df[column])
+        plt.title(f'Boxplot of {column}')
+
+    # Show the plots
+    plt.tight_layout()
+    st.pyplot(plt)
+
+
+
+# Automatically detect numerical columns
+numerical_columns = df.select_dtypes(include=['number']).columns.tolist()
+
+# Streamlit app
+st.title("Correlation Heatmap")
+
+# Create an expander for the correlation heatmap
+with st.expander("Show Correlation Heatmap"):
+    # Set up the matplotlib figure
+    plt.figure(figsize=(12, 8))
+    
+    # Calculate the correlation matrix
+    correlation_matrix = df[numerical_columns].corr()
+    
+    # Create the heatmap
+    sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm', square=True)
+    plt.title('Correlation Heatmap')
+    
+    # Show the plot in Streamlit
+    st.pyplot(plt)
+
+
+
+
+# Create a new column 'churn_status' based on churn history
+df['churn_status'] = df['churn_history'].apply(lambda x: 1 if x > 0 else 0)
+
+# Perform segmentation analysis
+segmentation_analysis = (
+    df.groupby(['membership_category', 'region_category', 'gender'])
+    .agg(
+        churn_count=('churn_status', 'sum'),
+        total_customers=('customer_id', 'count'),
+        churn_rate=('churn_status', 'mean')
+    )
+    .reset_index()
+)
+
+# 2.3 Customer Segmentation Analysis
+with st.expander("Show Segmentation Analysis"):
+    st.write("**Segmentation Analysis Data**")
+    st.dataframe(segmentation_analysis)
+
+    # Optional: Display summary statistics or insights
+    total_customers = segmentation_analysis['total_customers'].sum()
+    avg_churn_rate = segmentation_analysis['churn_rate'].mean()
+    
+    st.write(f"**Total Customers:** {total_customers}")
+    st.write(f"**Average Churn Rate:** {avg_churn_rate:.2%}")
+
+
+# Step 3: Feature Selection and Data Splitting
+
+
+
+
+
+
+
 
 
 
