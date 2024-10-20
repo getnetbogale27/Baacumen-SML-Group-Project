@@ -154,7 +154,7 @@ with st.expander('🔠 One-Hot Encoded Data Sample'):
 
 # 1.4 Outlier Detection & Handling
 # Function to detect and handle outliers using IQR
-def detect_outliers_iqr(data, column):
+def detect_outliers_iqr(df, column):
     Q1 = df[column].quantile(0.25)
     Q3 = df[column].quantile(0.75)
     IQR = Q3 - Q1
@@ -176,7 +176,7 @@ def detect_outliers_iqr(data, column):
 columns_to_check = ['age', 'avg_time_spent', 'avg_transaction_value', 'points_in_wallet']
 
 for col in columns_to_check:
-    detect_outliers_iqr(data, col)
+    detect_outliers_iqr(df, col)
 
 # Check the data after handling outliers
 st.write("Data after handling outliers using IQR:")
