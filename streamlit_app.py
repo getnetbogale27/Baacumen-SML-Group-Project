@@ -17,10 +17,6 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 
 import scipy.stats as stats
 
-
-# Cache the data loading function
-
-
 @st.cache_data
 def load_data():
     url = 'https://raw.githubusercontent.com/getnetbogale27/Baacumen-SML-Group-Project/main/Dataset/train.csv'
@@ -31,14 +27,29 @@ def load_data():
     ML_Data.to_csv('ML-Data.csv', index=False)
     return ML_Data
 
-
 # Load the data
 df = load_data()
 
-# Streamlit app title
-st.title('🤖 Machine Learning App')
 
-st.info('This app explores child undernutrition data and builds a predictive machine learning model.')
+#Step 2
+# Streamlit App Setup
+# Streamlit title and info
+st.title('🤖 Supervised ML App')
+# List of Authors
+st.write("**Authors:** Getnet B. (PhD Candidate), Bezawit Belachew (Dr.), Tadele, "
+         "Selamawit, Michiakel")
+
+st.info(
+    "The primary objective of this project is to build a predictive model that calculates the Churn "
+    "Risk Score for each customer based on their behavioral, demographic, and transactional data. "
+    "This score will help the business identify customers who are at risk of churning, allowing the "
+    "company to implement targeted retention strategies. The churn risk score will be represented on "
+    "a scale from 1 (low churn risk) to 5 (high churn risk)."
+)
+
+
+
+
 
 # Expanders for different data views
 with st.expander('🔢 Raw data (first 5 rows)'):
