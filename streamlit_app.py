@@ -71,6 +71,39 @@ with st.expander('🎯 Y (dependent variable) (first 5 rows)'):
     st.write(y_raw.head(5).reset_index(drop=True))
 
 
+## Data Preprocessing
+## 1.1 Handling Missing Data (5 Marks)
+
+# Define specific values to replace with NaN
+missing_values = {
+    'gender': ['Unknown'],
+    'joined_through_referral': ['?'],
+    'medium_of_operation': ['?'],
+    'churn_risk_score': [-1]
+}
+
+# Replace these specified values with NaN
+df.replace(missing_values, np.nan, inplace=True)
+
+# Capture the missing data summary
+missing_data_summary = df.isnull().sum()
+
+# Create an expander to show missing data summary
+with st.expander('⚠️ Missing Data Summary'):
+    st.write(missing_data_summary)
+
+
+
+
+
+# Check for missing values
+
+
+
+
+
+
+
 
 # function to convert minutes to HH:MM:SS format
 def minutes_to_time(minutes):
@@ -128,6 +161,20 @@ with st.sidebar:
 # Example button to confirm input submission
 if st.button('Submit'):
     st.write('Input features submitted successfully!')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
