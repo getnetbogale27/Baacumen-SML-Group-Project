@@ -20,7 +20,7 @@ from io import StringIO
 
 @st.cache_data
 def load_data():
-    url = 'https://raw.githubusercontent.com/getnetbogale27/Baacumen-SML-Group-Project/main/Dataset/train.csv'
+    url = 'https://raw.githubusercontent.com/getnetbogale27/Baacumen-SML-Group-Project/main/Dataset/trainrr.csv'
     df = pd.read_csv(url)
     # Rename dataset to 'ML-Data'
     ML_Data = df.copy()  
