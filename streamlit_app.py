@@ -90,8 +90,8 @@ missing_data_summary = df.isnull().sum()
 
 # Create an expander to show missing data summary
 with st.expander('⚠️ Missing Data Summary (Before Imputation)'):
-    # st.write(missing_data_summary)
-    st.write(data.isnull().sum())
+    st.write(missing_data_summary)
+    # st.write(data.isnull().sum())
 
 
 # Treat for missing values
