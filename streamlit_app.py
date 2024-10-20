@@ -20,7 +20,7 @@ from io import StringIO
 
 @st.cache_data
 def load_data():
-    url = 'https://raw.githubusercontent.com/getnetbogale27/Baacumen-SML-Group-Project/main/Dataset/trainrr.csv'
+    url = 'https://raw.githubusercontent.com/getnetbogale27/Baacumen-SML-Group-Project/main/Dataset/train.csv'
     df = pd.read_csv(url)
     # Rename dataset to 'ML-Data'
     ML_Data = df.copy()  
@@ -152,6 +152,7 @@ with st.expander('🔠 One-Hot Encoded Data Sample'):
     st.write(data_one_hot_encoded.head())
 
 
+# 1.4 Outlier Detection & Handling
 # Function to detect and handle outliers using IQR
 def detect_outliers_iqr(df, column):
     if column not in df.columns:
@@ -233,7 +234,8 @@ with st.expander('📊 Boxplots for Outlier Visualization and Handling'):
     st.pyplot(fig)
     st.pyplot(fig2)
 
-sdjhsdhvj hdjkh jkwd vjkwdjvk erjk ger vjker jvker jkvuer gyuery hh
+
+
 
 # 1.5 Feature Engineering
 
