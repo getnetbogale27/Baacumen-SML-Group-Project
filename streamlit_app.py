@@ -119,7 +119,7 @@ df['churn_risk_score'].fillna(df['churn_risk_score'].median(), inplace=True)
 
 # Expander 2: Show missing data summary after imputation
 with st.expander('✅ Missing Data Summary (After Imputation)'):
-    st.write(data.isnull().sum())
+    st.write(df.isnull().sum())
 
 
 
