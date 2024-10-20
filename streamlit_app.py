@@ -138,7 +138,20 @@ with st.expander('🛠️ Data Types After Correction'):
     st.write(data_types_after_correction)
 
 
+# 1.3 Encoding Categorical Variables
+# Identify categorical columns for One-Hot Encoding
+categorical_columns_one_hot = [
+    'gender', 'region_category', 'membership_category', 'joined_through_referral',
+    'preferred_offer_types', 'medium_of_operation', 'used_special_discount',
+    'offer_application_preference', 'past_complaint', 'complaint_status', 'feedback'
+]
 
+# Perform One-Hot Encoding
+data_one_hot_encoded = pd.get_dummies(df, columns=categorical_columns_one_hot, drop_first=True)
+
+# Expander: Display the first few rows of the new DataFrame
+with st.expander('🔠 One-Hot Encoded Data Sample'):
+    st.write(data_one_hot_encoded.head())
 
 
 
