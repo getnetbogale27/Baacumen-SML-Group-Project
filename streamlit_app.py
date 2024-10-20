@@ -89,15 +89,37 @@ df.replace(missing_values, np.nan, inplace=True)
 missing_data_summary = df.isnull().sum()
 
 # Create an expander to show missing data summary
-with st.expander('⚠️ Missing Data Summary'):
-    st.write(missing_data_summary)
+with st.expander('⚠️ Missing Data Summary (Before Imputation)'):
+    # st.write(missing_data_summary)
+    st.write(data.isnull().sum())
 
 
+# Treat for missing values
+# Step 1: Define specific values to replace with NaN
+# Allready we done previously
 
+# Step 2: Handle Categorical Columns
+categorical_cols = [
+    'gender', 'region_category', 'joined_through_referral', 
+    'preferred_offer_types', 'medium_of_operation'
+]
 
+for col in categorical_cols:
+    if col in ['joined_through_referral', 'medium_of_operation']:
+        # Impute with 'Unknown'
+        df[col].fillna('Unknown', inplace=True)
+    else:
+        # Impute with mode (most frequent value)
+        mode_value = df[col].mode()[0]
+        df[col].fillna(mode_value, inplace=True)
 
-# Check for missing values
+# Step 3: Handle Numerical Columns
+df['points_in_wallet'].fillna(df['points_in_wallet'].median(), inplace=True)
+df['churn_risk_score'].fillna(df['churn_risk_score'].median(), inplace=True)
 
+# Expander 2: Show missing data summary after imputation
+with st.expander('✅ Missing Data Summary (After Imputation)'):
+    st.write(data.isnull().sum())
 
 
 
