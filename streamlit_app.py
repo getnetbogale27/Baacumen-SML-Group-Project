@@ -72,140 +72,54 @@ with st.expander('🎯 Y (dependent variable) (first 5 rows)'):
 
 
 
-# Sidebar inputs
+# Sidebar for input features
 with st.sidebar:
-    st.header('Input features')
+    st.header('Input Features')
 
-    # Input features Continous and categorical variables
-    region = st.selectbox('Region', [
-                          'Tigray', 'Amhara', 'Oromiya', 'SNNP', 'Addis Ababa City Administration'], index=0)
-    residence = st.selectbox('Residence', ['Urban', 'Rural'], index=0)
-    ch_sex = st.selectbox('Child Sex', ['Male', 'Female'], index=0)
-    ch_age_mon = st.slider('Child Age in Months', 4, 192, 50, step=1)
-    ch_age_category = st.selectbox('Child Age Category', [
-                                   'Infancy', 'Early childhood', 'Middle childhood/ Preadolescence', 'Adolescence'], index=0)
-    ch_longterm_health_problem = st.selectbox(
-        'Long-term Health Problem', ['No', 'Yes'], index=0)
-    ch_health_compared_peers = st.selectbox('Health Compared to Peers', [
-                                            'Same', 'Better', 'Worse'], index=0)
-    ch_health_general_new = st.selectbox(
-        'General Health', ['Poor', 'Average', 'Good'], index=0)
-    ch_injury = st.selectbox('Child Injury', ['No', 'Yes'], index=0)
-    csw = st.selectbox('Child\'s Social Welfare (CSW)',
-                       ['Low', 'High'], index=0)
-    care_edu_new = st.selectbox('Caregiver Education', [
-                                'Illiterate', 'Literate'], index=0)
-    care_rln_head = st.selectbox('Caregiver Relationship to Household Head', [
-                                 'Caregiver is household head', 'Caregiver is partner of household head'], index=0)
-    care_age = st.slider('Caregiver Age', 8, 87, 30, step=1)
-    care_sex = st.selectbox('Caregiver Sex', ['Male', 'Female'], index=0)
-    care_relat = st.selectbox('Caregiver Relation', [
-                              'Biological parent', 'Non-biological parent'], index=0)
-    cgws = st.selectbox('Caregiver Social Welfare (CGWS)',
-                        ['Low', 'High'], index=0)
-    dad_age = st.slider('Dad Age', 19, 90, 40, step=1)
-    dad_edu_new = st.selectbox(
-        'Dad Education', ['Illiterate', 'Literate'], index=0)
-    dad_live_location = st.selectbox('Dad Live Location', [
-                                     'Lives in the household', 'Does not live in household', 'Has died'], index=0)
-    mom_live_location = st.selectbox('Mom Live Location', [
-                                     'Lives in the household', 'Does not live in household'], index=0)
-    mom_age = st.slider('Mom Age', 15, 64, 35, step=1)
-    mom_edu_new = st.selectbox(
-        'Mom Education', ['Illiterate', 'Literate'], index=0)
-    head_edu_new = st.selectbox('Household Head Education', [
-                                'Illiterate', 'Literate'], index=0)
-    head_age = st.slider('Household Head Age', 5, 110, 45, step=1)
-    head_sex = st.selectbox('Household Head Sex', ['Male', 'Female'], index=0)
-    head_relation = st.selectbox('Household Head Relation', [
-                                 'Biological Parent', 'Non-biological Parent'], index=0)
-    household_size = st.selectbox('Household Size', ['<=6', '>6'], index=0)
-    wealth_quintile = st.selectbox('Wealth Quintile', [
-                                   'Poorest', 'Secondary', 'Middle', 'Fourth', 'Wealthiest'], index=0)
-    access_to_safe_drinking_water = st.selectbox(
-        'Access to Safe Drinking Water', ['No', 'Yes'], index=0)
-    access_to_toilet = st.selectbox('Access to Toilet', ['No', 'Yes'], index=0)
-    access_to_electricity = st.selectbox(
-        'Access to Electricity', ['No', 'Yes'], index=0)
-    access_to_cooking_fuels = st.selectbox(
-        'Access to Cooking Fuels', ['No', 'Yes'], index=0)
+    # Input fields
+    gender = st.selectbox('Gender', ['F', 'M'], index=0)
+    region_category = st.selectbox('Region Category', ['Village', 'City', 'Town'], index=0)
+    membership_category = st.selectbox('Membership Category', [
+        'Platinum Membership', 'Premium Membership', 'No Membership', 
+        'Gold Membership', 'Silver Membership', 'Basic Membership'], index=0)
 
-# Convert inputs to numeric codes
+    joining_date = st.date_input(
+        'Joining Date', value=pd.to_datetime('2015-01-01'),
+        min_value=pd.to_datetime('2015-01-01'),
+        max_value=pd.to_datetime('2017-12-31'))
+
+    joined_through_referral = st.selectbox('Joined through Referral', ['Yes', 'No'], index=0)
+    preferred_offer_types = st.selectbox('Preferred Offer Types', [
+        'Gift Vouchers/Coupons', 'Credit/Debit Card Offers', 'Without Offers'], index=0)
+    
+    medium_of_operation = st.selectbox('Medium of Operation', ['Both', 'Desktop', 'Smartphone'], index=0)
+    internet_option = st.selectbox('Internet Option', ['Wi-Fi', 'Mobile_Data', 'Fiber_Optic'], index=0)
+
+    last_visit_time = st.slider('Last Visit Time', 0.0, 24.0, 12.0, step=0.01, format="%02.0f:%02.0f")
+
+    days_since_last_login = st.slider('Days Since Last Login', 1, 26, 13, step=1)
+    avg_time_spent = st.slider('Average Time Spent', -2096.58, 2732.70, 0.0, step=0.01)
+    avg_transaction_value = st.slider('Average Transaction Value', 806.22, 99805.52, 5000.0, step=0.01)
+    avg_frequency_login_days = st.slider('Average Frequency of Login Days', -43.65, 73.06, 0.0, step=0.01)
+    points_in_wallet = st.slider('Points in Wallet', -549.36, 1755.09, 0.0, step=0.01)
+
+    used_special_discount = st.selectbox('Used Special Discount', ['Yes', 'No'], index=0)
+    offer_application_preference = st.selectbox('Offer Application Preference', ['Yes', 'No'], index=0)
+    past_complaint = st.selectbox('Past Complaint', ['Yes', 'No'], index=0)
+
+    complaint_status = st.selectbox('Complaint Status', [
+        'Not Applicable', 'Solved', 'Solved in Follow-up', 'Unsolved', 'No Information Available'], index=0)
+
+    feedback = st.selectbox('Feedback', [
+        'Products always in Stock', 'Quality Customer Care', 'Poor Website', 
+        'No reason specified', 'Poor Product Quality', 'Too many ads', 
+        'User Friendly Website', 'Poor Customer Service', 'Reasonable Price'], index=0)
+
+# Example button to confirm input submission
+if st.button('Submit'):
+    st.write('Input features submitted successfully!')
 
 
-def encode_inputs(X_columns):
-    region_map = {'Tigray': 1, 'Amhara': 3, 'Oromiya': 4,
-                  'SNNP': 7, 'Addis Ababa City Administration': 14}
-    residence_map = {'Urban': 1, 'Rural': 2}
-    ch_sex_map = {'Male': 1, 'Female': 2}
-    ch_age_category_map = {'Infancy': 1, 'Early childhood': 2,
-                           'Middle childhood/ Preadolescence': 3, 'Adolescence': 4}
-    ch_longterm_health_problem_map = {'No': 1, 'Yes': 2}
-    ch_health_compared_peers_map = {'Same': 1, 'Better': 2, 'Worse': 3}
-    ch_health_general_new_map = {'Poor': 1, 'Average': 2, 'Good': 3}
-    ch_injury_map = {'No': 1, 'Yes': 2}
-    csw_map = {'Low': 1, 'High': 2}
-    care_edu_new_map = {'Illiterate': 1, 'Literate': 2}
-    care_rln_head_map = {'Caregiver is household head': 1,
-                         'Caregiver is partner of household head': 2}
-    care_sex_map = {'Male': 1, 'Female': 2}
-    care_relat_map = {'Biological parent': 1, 'Non-biological parent': 2}
-    cgws_map = {'Low': 1, 'High': 2}
-    dad_edu_new_map = {'Illiterate': 1, 'Literate': 2}
-    dad_live_location_map = {'Lives in the household': 1,
-                             'Does not live in household': 2, 'Has died': 3}
-    mom_live_location_map = {
-        'Lives in the household': 1, 'Does not live in household': 2}
-    mom_edu_new_map = {'Illiterate': 1, 'Literate': 2}
-    head_edu_new_map = {'Illiterate': 1, 'Literate': 2}
-    head_sex_map = {'Male': 1, 'Female': 2}
-    head_relation_map = {'Biological Parent': 1, 'Non-biological Parent': 2}
-    household_size_map = {'<=6': 1, '>6': 2}
-    wealth_quintile_map = {'Poorest': 1, 'Secondary': 2,
-                           'Middle': 3, 'Fourth': 4, 'Wealthiest': 5}
-    access_to_safe_drinking_water_map = {'No': 1, 'Yes': 2}
-    access_to_toilet_map = {'No': 1, 'Yes': 2}
-    access_to_electricity_map = {'No': 1, 'Yes': 2}
-    access_to_cooking_fuels_map = {'No': 1, 'Yes': 2}
-
-    input_data = pd.DataFrame({
-        'Region': [region_map[region]],
-        'Residence': [residence_map[residence]],
-        'Ch_sex': [ch_sex_map[ch_sex]],
-        'Ch_age_mon': [ch_age_mon],
-        'Ch_Age_Category': [ch_age_category_map[ch_age_category]],
-        'Ch_longterm_health_problem': [ch_longterm_health_problem_map[ch_longterm_health_problem]],
-        'Ch_health_compared_peers': [ch_health_compared_peers_map[ch_health_compared_peers]],
-        'Ch_health_general_new': [ch_health_general_new_map[ch_health_general_new]],
-        'Ch_injury': [ch_injury_map[ch_injury]],
-        'CSW': [csw_map[csw]],
-        'Care_Edu_New': [care_edu_new_map[care_edu_new]],
-        'Care_rln_head': [care_rln_head_map[care_rln_head]],
-        'Care_age': [care_age],
-        'Care_sex': [care_sex_map[care_sex]],
-        'Care_relat': [care_relat_map[care_relat]],
-        'CGSW': [cgws_map[cgws]],
-        'Dad_age': [dad_age],
-        'Dad_Edu_New': [dad_edu_new_map[dad_edu_new]],
-        'Dad_live_location': [dad_live_location_map[dad_live_location]],
-        'Mom_live_location': [mom_live_location_map[mom_live_location]],
-        'Mom_age': [mom_age],
-        'Mom_Edu_New': [mom_edu_new_map[mom_edu_new]],
-        'Head_Edu_New': [head_edu_new_map[head_edu_new]],
-        'Head_age': [head_age],
-        'Head_sex': [head_sex_map[head_sex]],
-        'Head_Relation': [head_relation_map[head_relation]],
-        'Household_size': [household_size_map[household_size]],
-        'Wealth_quintile': [wealth_quintile_map[wealth_quintile]],
-        'Access_to_safe_drinking_water': [access_to_safe_drinking_water_map[access_to_safe_drinking_water]],
-        'Access_to_toilet': [access_to_toilet_map[access_to_toilet]],
-        'Access_to_electricity': [access_to_electricity_map[access_to_electricity]],
-        'Access_to_cooking_fuels': [access_to_cooking_fuels_map[access_to_cooking_fuels]],
-    })
-
-    # Ensure the DataFrame has the same columns as the training data
-    input_data = input_data.reindex(columns=X_columns, fill_value=0)
-    return input_data
 
 
 with st.expander('📈 Data visualization'):
