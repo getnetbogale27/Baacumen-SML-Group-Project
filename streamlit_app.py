@@ -238,15 +238,22 @@ with st.expander('📊 Boxplots for Outlier Visualization and Handling'):
 
 
 # 1.5 Feature Engineering
-
+# Feature Engineering
 df['recency'] = df['days_since_last_login']
-df['engagement_score'] = (df['avg_time_spent'] * 0.5 + (1 / (df['days_since_last_login'] + 1)) * 0.5)
-df['churn_history'] = df['past_complaint'].apply(lambda x: 1 if x == 'Yes' else 0)
-df['points_utilization_rate'] = df['points_in_wallet'] / (df['points_in_wallet'] + 1)
+df['engagement_score'] = (df['avg_time_spent'] * 0.5 +
+                          (1 / (df['days_since_last_login'] + 1)) * 0.5)
+df['churn_history'] = df['past_complaint'].apply(
+    lambda x: 1 if x == 'Yes' else 0)
+df['points_utilization_rate'] = df['points_in_wallet'] / \
+    (df['points_in_wallet'] + 1)
 df['customer_tenure'] = (pd.to_datetime('today') - df['joining_date']).dt.days
-df['is_active'] = df['days_since_last_login'].apply(lambda x: 1 if x <= 30 else 0)
-df['login_frequency'] = (30 / df['days_since_last_login']).replace([float('inf'), -float('inf')], 0)
-df['avg_engagement_score'] = df['avg_time_spent'] / (df['days_since_last_login'] + 1)
+df['is_active'] = df['days_since_last_login'].apply(
+    lambda x: 1 if x <= 30 else 0)
+df['login_frequency'] = (30 / df['days_since_last_login']
+                         ).replace([float('inf'), -float('inf')], 0)
+df['avg_engagement_score'] = df['avg_time_spent'] / \
+    (df['days_since_last_login'] + 1)
+
 
 def tenure_category(tenure):
     if tenure < 30:
@@ -256,24 +263,27 @@ def tenure_category(tenure):
     else:
         return 'Loyal'
 
+
 df['tenure_category'] = df['customer_tenure'].apply(tenure_category)
-df['offer_responsiveness'] = df['preferred_offer_types'].apply(lambda x: 1 if any(offer in df['used_special_discount'][i] for offer in x) else 0)
+
+# Update to correctly calculate offer_responsiveness
+df['offer_responsiveness'] = df.apply(lambda row: 1 if any(
+    offer in row['used_special_discount'] for offer in row['preferred_offer_types']) else 0, axis=1)
 
 # Streamlit expander to show newly created columns/features
-with st.expander("Newly Created Features"):
+with st.expander("Show Newly Created Features"):
     st.dataframe(df[[
-        'recency', 
-        'engagement_score', 
-        'churn_history', 
-        'points_utilization_rate', 
-        'customer_tenure', 
-        'is_active', 
-        'login_frequency', 
-        'avg_engagement_score', 
-        'tenure_category', 
+        'recency',
+        'engagement_score',
+        'churn_history',
+        'points_utilization_rate',
+        'customer_tenure',
+        'is_active',
+        'login_frequency',
+        'avg_engagement_score',
+        'tenure_category',
         'offer_responsiveness'
     ]].head())
-
 
 
 
