@@ -236,37 +236,16 @@ with st.expander('📊 Boxplots for Outlier Visualization and Handling'):
 sdjhsdhvj hdjkh jkwd vjkwdjvk erjk ger vjker jvker jkvuer gyuery hh
 
 # 1.5 Feature Engineering
-# Feature Engineering
-df['recency'] = df['days_since_last_login']  # Days since last login
 
-# Calculate Total Monetary Value
-# df['monetary_value'] = df['avg_transaction_value'] * df['transaction_frequency']  # Total monetary value
-
-# Calculate Average Order Value (AOV)
-# df['average_order_value'] = df['monetary_value'] / (df['transaction_frequency'] + 1)  # AOV safeguard
-
-# Engagement Score: Adjust weights based on analysis
+df['recency'] = df['days_since_last_login']
 df['engagement_score'] = (df['avg_time_spent'] * 0.5 + (1 / (df['days_since_last_login'] + 1)) * 0.5)
-
-# Churn History: 1 if they have complained, else 0
 df['churn_history'] = df['past_complaint'].apply(lambda x: 1 if x == 'Yes' else 0)
-
-# Points Utilization Rate: How effectively customers are using their points
 df['points_utilization_rate'] = df['points_in_wallet'] / (df['points_in_wallet'] + 1)
-
-# Customer Tenure in Days: How long the customer has been with the company
 df['customer_tenure'] = (pd.to_datetime('today') - df['joining_date']).dt.days
-
-# Is Active: Whether the customer has logged in within the last 30 days
 df['is_active'] = df['days_since_last_login'].apply(lambda x: 1 if x <= 30 else 0)
-
-# Login Frequency: Calculate login frequency as an inverse relationship with days since last login
 df['login_frequency'] = (30 / df['days_since_last_login']).replace([float('inf'), -float('inf')], 0)
-
-# Average Engagement Score: Average time spent adjusted for days since last login
 df['avg_engagement_score'] = df['avg_time_spent'] / (df['days_since_last_login'] + 1)
 
-# Tenure-Based Segmentation: Categorizing customers based on their tenure
 def tenure_category(tenure):
     if tenure < 30:
         return 'New'
@@ -276,13 +255,11 @@ def tenure_category(tenure):
         return 'Loyal'
 
 df['tenure_category'] = df['customer_tenure'].apply(tenure_category)
+df['offer_responsiveness'] = df['preferred_offer_types'].apply(lambda x: 1 if any(offer in df['used_special_discount'][i] for offer in x) else 0)
 
-# Offer Responsiveness: How often customers respond to offers
-df['offer_responsiveness'] = df.apply(lambda x: 1 if x['preferred_offer_types'] in x['used_special_discount'] else 0, axis=1)
-
-# Display the newly created features using Streamlit expander
-with st.expander("Newly Created Features", expanded=True):
-    st.write(df[[
+# Streamlit expander to show newly created columns/features
+with st.expander("Newly Created Features"):
+    st.dataframe(df[[
         'recency', 
         'engagement_score', 
         'churn_history', 
