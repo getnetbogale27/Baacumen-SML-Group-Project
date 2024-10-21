@@ -438,13 +438,30 @@ with st.expander("Treating Outlier for newly computed features"):
 # Automatically detect numerical columns
 numerical_columns = df.select_dtypes(include=['number']).columns.tolist()
 
-# Create an expander for the correlation heatmap
+# # Create an expander for the correlation heatmap
+# with st.expander("Show Correlation Heatmap"):
+#     # Set up the matplotlib figure
+#     plt.figure(figsize=(12, 8))
+    
+#     # Calculate the correlation matrix
+#     correlation_matrix = df[numerical_columns].corr()
+    
+#     # Create the heatmap
+#     sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm', square=True)
+#     plt.title('Correlation Heatmap')
+    
+#     # Show the plot in Streamlit
+#     st.pyplot(plt)
+
 with st.expander("Show Correlation Heatmap"):
+    # Exclude the 'is_active' column from numerical columns
+    filtered_numerical_columns = [col for col in numerical_columns if col != 'is_active']
+    
     # Set up the matplotlib figure
     plt.figure(figsize=(12, 8))
     
-    # Calculate the correlation matrix
-    correlation_matrix = df[numerical_columns].corr()
+    # Calculate the correlation matrix using the filtered columns
+    correlation_matrix = df[filtered_numerical_columns].corr()
     
     # Create the heatmap
     sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm', square=True)
@@ -452,7 +469,6 @@ with st.expander("Show Correlation Heatmap"):
     
     # Show the plot in Streamlit
     st.pyplot(plt)
-
 
 
 
@@ -485,22 +501,23 @@ with st.expander("Show Segmentation Analysis"):
 
 # Step 3: Feature Selection and Data Splitting
 
-# 3.2 Data Splitting (X and Y)
+# 3.1 Feature Selection (X and Y)
 churn_risk_score = df.pop('churn_risk_score')  # Remove the column
 df['churn_risk_score'] = churn_risk_score  # Append it to the end
 
 with st.expander('🔢 Raw data (first 5 rows) including newly computed features before spliting to train and test set'):
     st.write(df.head(5))  # Display first 5 rows of raw data
 
-with st.expander('🧩 X (independent variables) (first 5 rows)'):
+with st.expander('🧩 X (Features) (first 5 rows)'):
     X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
     st.write(X.head(5)) 
 
-with st.expander('🎯 Y (dependent variable) (first 5 rows)'):
+with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     y = df.iloc[:, -1]  
     st.write(y.head(5).reset_index(drop=True))
 
 
+# 3.2 Data Splitting
 
 # Preprocess X_raw
 def preprocess_data(X):
