@@ -552,7 +552,7 @@ with st.expander("📊 Correlation Matrix"):
 # Recursive Feature Elimination (RFE)
 with st.expander("🔄 Recursive Feature Elimination (RFE)"):
     if y is not None and not X.empty:
-        # Display the shape of the DataFrames
+        # Display shape of X and y
         st.write("Shape of X:", X.shape)
         st.write("Shape of y:", y.shape)
 
@@ -561,27 +561,35 @@ with st.expander("🔄 Recursive Feature Elimination (RFE)"):
         if non_numeric_cols:
             st.write(f"Non-numeric columns detected: {non_numeric_cols}")
 
-            # Apply one-hot encoding to non-numeric columns
+            # Apply one-hot encoding
             X = pd.get_dummies(X, drop_first=True)
             st.write("After encoding, shape of X:", X.shape)
 
-        # Check for NaN values again after encoding
+        # Check for NaN values
         if X.isnull().values.any() or y.isnull().any():
-            st.write("Warning: There are NaN values in X or y. Please handle them before proceeding.")
+            st.write("Warning: There are NaN values in X or y. Please handle them.")
         else:
-            # Fit the RFE model
-            model = RandomForestClassifier()
+            # Optional: Use stratified sampling for faster RFE
+            X_sample, _, y_sample, _ = train_test_split(X, y, 
+                                                        train_size=0.3, 
+                                                        stratify=y, 
+                                                        random_state=42)
+            st.write("Using a sample of data for RFE. Sample shape:", X_sample.shape)
+
+            # Initialize the model and RFE
+            model = RandomForestClassifier(n_jobs=-1, random_state=42)
             rfe = RFE(model, n_features_to_select=10)
+
             try:
-                fit = rfe.fit(X, y)
-                selected_features_rfe = X.columns[fit.support_].tolist()
+                # Fit RFE on the sample
+                fit = rfe.fit(X_sample, y_sample)
+                selected_features_rfe = X_sample.columns[fit.support_].tolist()
                 st.write("Selected Features using RFE:", selected_features_rfe)
             except ValueError as e:
-                st.write(f"ValueError: {str(e)}")
-                st.write("Ensure that X and y have compatible shapes and types.")
+                st.write(f"Error: {str(e)}")
+                st.write("Ensure that X and y have compatible shapes and data types.")
     else:
         st.write("Cannot perform RFE: Ensure that X and y are defined correctly.")
-
 
 
 
