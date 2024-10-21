@@ -530,6 +530,8 @@ with st.expander("📊 Correlation Matrix"):
             correlation_matrix = numeric_df.corr()
             st.write(correlation_matrix)
 
+            # Debugging: Print available columns in the correlation matrix
+            st.write("Available columns in the correlation matrix:", correlation_matrix.columns.tolist())
             threshold = 0.1  # Change as needed
             
             # Check if 'churn_risk_score' exists in the correlation matrix
