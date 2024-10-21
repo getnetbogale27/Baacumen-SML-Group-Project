@@ -21,6 +21,12 @@ from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.feature_selection import RFE
+from sklearn.feature_selection import SelectKBest, f_classif
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+
+
 
 
 @st.cache_data
@@ -520,47 +526,42 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 
-# Assuming 'df' is your DataFrame and you've already separated features and target variable
-churn_risk_score = df.pop('churn_risk_score')  # Remove the column
-df['churn_risk_score'] = churn_risk_score  # Append it to the end
-X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
-y = df.iloc[:, -1]  
+# Feature selection using SelectKBest
+selector = SelectKBest(score_func=f_classif, k=3)  # Change k as needed
+X_selected = selector.fit_transform(X, y)
+selected_indices = selector.get_support(indices=True)
+selected_features = X.columns[selected_indices].tolist()
 
-# Create an expander for feature selection using RFE
-with st.expander('🔍 Feature Selection'):
-    st.write("Using Recursive Feature Elimination (RFE) for feature selection:")
-    
-    # Define your model
-    model = RandomForestClassifier()
-    
-    # Create RFE model and select features
-    rfe = RFE(model, n_features_to_select=10)  # Change to your desired number of features
-    fit = rfe.fit(X, y)
-    
-    # Get the selected features
-    selected_features = X.columns[fit.support_].tolist()
-    
-    # Display selected features
-    st.write("Selected Features:")
+# Split data into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(X_selected, y, test_size=0.2, random_state=42)
+
+# Train a RandomForestClassifier
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Calculate metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
+recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
+
+with st.expander("🎯 Selected Features from Feature Selection"):
     st.write(selected_features)
-    
-    # Optionally, display the feature ranking
-    feature_ranking = pd.DataFrame({
-        'Feature': X.columns,
-        'Ranking': fit.ranking_
-    })
-    st.write("Feature Rankings:")
-    st.write(feature_ranking.sort_values(by='Ranking'))
 
-# Another expander for displaying correlation matrix
-with st.expander('📊 Correlation Matrix'):
-    st.write("Visualizing the correlation between features and the target variable:")
-    
-    # Calculate the correlation matrix
+with st.expander("📊 Model Evaluation Metrics"):
+    st.write("Accuracy:", accuracy)
+    st.write("Precision:", precision)
+    st.write("Recall:", recall)
+
+# Visualizing correlation matrix
+with st.expander("📈 Data Insights: Correlation Matrix"):
+    plt.figure(figsize=(10, 8))
     correlation_matrix = df.corr()
-    
-    # Display heatmap using Streamlit
-    st.write(sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap="coolwarm"))
+    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
+    plt.title("Correlation Matrix")
+    st.pyplot(plt)
 
 
 
