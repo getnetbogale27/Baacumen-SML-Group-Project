@@ -20,7 +20,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
-
+from sklearn.feature_selection import RFE
 
 
 @st.cache_data
@@ -515,6 +515,56 @@ with st.expander('🧩 X (Features) (first 5 rows)'):
 with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     y = df.iloc[:, -1]  
     st.write(y.head(5).reset_index(drop=True))
+
+
+
+
+
+# Assuming 'df' is your DataFrame and you've already separated features and target variable
+churn_risk_score = df.pop('churn_risk_score')  # Remove the column
+df['churn_risk_score'] = churn_risk_score  # Append it to the end
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
+y = df.iloc[:, -1]  
+
+# Create an expander for feature selection using RFE
+with st.expander('🔍 Feature Selection'):
+    st.write("Using Recursive Feature Elimination (RFE) for feature selection:")
+    
+    # Define your model
+    model = RandomForestClassifier()
+    
+    # Create RFE model and select features
+    rfe = RFE(model, n_features_to_select=10)  # Change to your desired number of features
+    fit = rfe.fit(X, y)
+    
+    # Get the selected features
+    selected_features = X.columns[fit.support_].tolist()
+    
+    # Display selected features
+    st.write("Selected Features:")
+    st.write(selected_features)
+    
+    # Optionally, display the feature ranking
+    feature_ranking = pd.DataFrame({
+        'Feature': X.columns,
+        'Ranking': fit.ranking_
+    })
+    st.write("Feature Rankings:")
+    st.write(feature_ranking.sort_values(by='Ranking'))
+
+# Another expander for displaying correlation matrix
+with st.expander('📊 Correlation Matrix'):
+    st.write("Visualizing the correlation between features and the target variable:")
+    
+    # Calculate the correlation matrix
+    correlation_matrix = df.corr()
+    
+    # Display heatmap using Streamlit
+    st.write(sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap="coolwarm"))
+
+
+
+
 
 
 # 3.2 Data Splitting
