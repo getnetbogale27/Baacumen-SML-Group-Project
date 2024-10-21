@@ -107,7 +107,7 @@ categorical_cols = [
 ]
 
 continuous_cols = [
-    'points_in_wallet', 'churn_risk_score'
+    'points_in_wallet', 'churn_risk_score', 'days_since_last_login'
 ]
 
 # Step 4: Impute Missing Values for Categorical Columns (with Mode)
