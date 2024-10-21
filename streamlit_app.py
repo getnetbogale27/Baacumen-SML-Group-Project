@@ -522,17 +522,8 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 # Feature Selection Section
-st.header("🔍 Feature Selection Methods")
+# st.header("🔍 Feature Selection Methods")
 
-# # Correlation Matrix
-# with st.expander("📊 Correlation Matrix"):
-#     correlation_matrix = df.corr()
-#     st.write(correlation_matrix)
-#     threshold = 0.1  # Change as needed
-#     selected_features_corr = correlation_matrix[abs(correlation_matrix['churn_risk_score']) > threshold].index.tolist()
-#     selected_features_corr.remove('churn_risk_score')  # Remove target variable
-#     st.write("Selected Features based on Correlation:", selected_features_corr)
-## d
 # Correlation Matrix
 with st.expander("📊 Correlation Matrix"):
     # Select only numeric columns for correlation
