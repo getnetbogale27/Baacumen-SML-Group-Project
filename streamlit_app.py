@@ -553,11 +553,13 @@ with st.expander('Dataset Previews'):
     selected_dataset = st.selectbox('Select a dataset to display:', list(datasets.keys()))
     
     # Display the selected dataset
+    st.write(f"**{selected_dataset} Preview:**")
     st.write(datasets[selected_dataset].head(5))
     
     # Display the corresponding test dataset if a training dataset is selected
     if 'Train' in selected_dataset:
         test_set_key = f'Test set {100 - int(selected_dataset.split()[2][:-1])}%'
+        st.write(f"**{test_set_key} Preview:**")
         st.write(datasets[test_set_key].head(5))
 
 
