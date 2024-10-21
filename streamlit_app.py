@@ -15,7 +15,12 @@ from sklearn.metrics import roc_curve, auc
 import numpy as np
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_auc_score
 import scipy.stats as stats
-from io import StringIO 
+from io import StringIO
+from sklearn.preprocessing import LabelEncoder 
+from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+
 
 
 @st.cache_data
@@ -500,6 +505,11 @@ with st.expander('🧩 X (independent variables) (first 5 rows)'):
 with st.expander('🎯 Y (dependent variable) (first 5 rows)'):
     y_raw = df.iloc[:, -1]  
     st.write(y_raw.head(5).reset_index(drop=True))
+
+
+
+
+
 
 
 
