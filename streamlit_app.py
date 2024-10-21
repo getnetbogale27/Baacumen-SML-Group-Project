@@ -248,8 +248,8 @@ df['churn_history'] = df['past_complaint'].apply(
 df['points_utilization_rate'] = df['points_in_wallet'] / \
     (df['points_in_wallet'] + 1)
 df['customer_tenure'] = (pd.to_datetime('today') - df['joining_date']).dt.days
-df['is_active'] = df['days_since_last_login'].apply(
-    lambda x: 1 if x <= 30 else 0)
+# df['is_active'] = df['days_since_last_login'].apply(
+#     lambda x: 1 if x <= 30 else 0)
 df['login_frequency'] = (30 / df['days_since_last_login']
                          ).replace([float('inf'), -float('inf')], 0)
 df['avg_engagement_score'] = df['avg_time_spent'] / \
@@ -279,7 +279,6 @@ with st.expander("Show Newly Created Features"):
         'churn_history',
         'points_utilization_rate',
         'customer_tenure',
-        'is_active',
         'login_frequency',
         'avg_engagement_score',
         'tenure_category',
@@ -379,7 +378,6 @@ numerical_columns = [
     'avg_transaction_value', 
     'points_in_wallet', 
     'customer_tenure', 
-    'is_active', 
     'login_frequency', 
     'avg_engagement_score', 
     'recency', 
@@ -458,9 +456,6 @@ numerical_columns = df.select_dtypes(include=['number']).columns.tolist()
 #     st.pyplot(plt)
 
 with st.expander("Show Correlation Heatmap"):
-    # Exclude the 'is_active' column from numerical columns
-    filtered_numerical_columns = [col for col in numerical_columns if col != 'is_active']
-    
     # Set up the matplotlib figure
     plt.figure(figsize=(12, 8))
     
