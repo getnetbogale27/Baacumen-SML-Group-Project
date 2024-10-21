@@ -547,34 +547,27 @@ with st.expander("📊 Correlation Matrix"):
         st.write("'churn_risk_score' does not exist in the DataFrame.")
 
 
-from sklearn.preprocessing import LabelEncoder
+# from sklearn.preprocessing import LabelEncoder
 
 # Recursive Feature Elimination (RFE)
 with st.expander("🔄 Recursive Feature Elimination (RFE)"):
     if y is not None and not X.empty:
+        # Display the shape of the DataFrames
         st.write("Shape of X:", X.shape)
         st.write("Shape of y:", y.shape)
 
         # Identify non-numeric columns
         non_numeric_cols = X.select_dtypes(exclude=[np.number]).columns.tolist()
-        st.write(f"Non-numeric columns detected: {non_numeric_cols}")
+        if non_numeric_cols:
+            st.write(f"Non-numeric columns detected: {non_numeric_cols}")
 
-        # Apply Label Encoding to binary columns and One-Hot Encoding to others
-        label_encoder = LabelEncoder()
-        binary_cols = [col for col in non_numeric_cols if X[col].nunique() == 2]
-        one_hot_cols = [col for col in non_numeric_cols if X[col].nunique() > 2]
+            # Apply one-hot encoding to non-numeric columns
+            X = pd.get_dummies(X, drop_first=True)
+            st.write("After encoding, shape of X:", X.shape)
 
-        # Apply Label Encoding
-        for col in binary_cols:
-            X[col] = label_encoder.fit_transform(X[col])
-
-        # Apply One-Hot Encoding for remaining categorical columns
-        X = pd.get_dummies(X, columns=one_hot_cols, drop_first=True)
-        st.write("After encoding, shape of X:", X.shape)
-
-        # Handle NaN values if present
+        # Check for NaN values again after encoding
         if X.isnull().values.any() or y.isnull().any():
-            st.write("Warning: There are NaN values in X or y. Please handle them.")
+            st.write("Warning: There are NaN values in X or y. Please handle them before proceeding.")
         else:
             # Fit the RFE model
             model = RandomForestClassifier()
@@ -588,6 +581,7 @@ with st.expander("🔄 Recursive Feature Elimination (RFE)"):
                 st.write("Ensure that X and y have compatible shapes and types.")
     else:
         st.write("Cannot perform RFE: Ensure that X and y are defined correctly.")
+
 
 
 
