@@ -21,10 +21,6 @@ from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.feature_selection import RFE
-from sklearn.feature_selection import SelectKBest, f_classif
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
 
@@ -524,44 +520,53 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 
+# Feature Selection Section
+with st.expander("🔍 Feature Selection Methods"):
+    
+    # Correlation Matrix
+    with st.expander("📊 Correlation Matrix"):
+        correlation_matrix = df.corr()
+        st.write(correlation_matrix)
+        threshold = 0.1  # Change as needed
+        selected_features_corr = correlation_matrix[abs(correlation_matrix['churn_risk_score']) > threshold].index.tolist()
+        selected_features_corr.remove('churn_risk_score')  # Remove target variable
+        st.write("Selected Features based on Correlation:", selected_features_corr)
+
+    # Recursive Feature Elimination (RFE)
+    with st.expander("🔄 Recursive Feature Elimination (RFE)"):
+        model = RandomForestClassifier()
+        rfe = RFE(model, n_features_to_select=10)
+        fit = rfe.fit(X, y)
+        selected_features_rfe = X.columns[fit.support_].tolist()
+        st.write("Selected Features using RFE:", selected_features_rfe)
+
+    # SelectKBest
+    with st.expander("⭐ SelectKBest"):
+        selector = SelectKBest(score_func=f_classif, k=10)
+        X_selected_kbest = selector.fit_transform(X, y)
+        selected_indices_kbest = selector.get_support(indices=True)
+        selected_features_kbest = X.columns[selected_indices_kbest].tolist()
+        st.write("Selected Features using SelectKBest:", selected_features_kbest)
+
+    # Lasso Regularization
+    with st.expander("🧩 Lasso Regularization"):
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        lasso = LassoCV(alphas=[0.01, 0.1, 1.0, 10.0], cv=5)
+        lasso.fit(X_scaled, y)
+        selected_features_lasso = X.columns[lasso.coef_ != 0].tolist()
+        st.write("Selected Features using Lasso:", selected_features_lasso)
+
+    # Boruta
+    with st.expander("🌟 Boruta"):
+        rf = RandomForestClassifier(n_jobs=-1, class_weight='balanced', max_depth=5)
+        boruta_selector = BorutaPy(estimator=rf, n_estimators='auto', verbose=2, random_state=42)
+        boruta_selector.fit(X.values, y.values)
+        selected_features_boruta = X.columns[boruta_selector.support_].tolist()
+        st.write("Selected Features using Boruta:", selected_features_boruta)
 
 
-# Feature selection using SelectKBest
-selector = SelectKBest(score_func=f_classif, k=3)  # Change k as needed
-X_selected = selector.fit_transform(X, y)
-selected_indices = selector.get_support(indices=True)
-selected_features = X.columns[selected_indices].tolist()
 
-# Split data into train and test sets
-X_train, X_test, y_train, y_test = train_test_split(X_selected, y, test_size=0.2, random_state=42)
-
-# Train a RandomForestClassifier
-model = RandomForestClassifier()
-model.fit(X_train, y_train)
-
-# Make predictions
-y_pred = model.predict(X_test)
-
-# Calculate metrics
-accuracy = accuracy_score(y_test, y_pred)
-precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
-recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
-
-with st.expander("🎯 Selected Features from Feature Selection"):
-    st.write(selected_features)
-
-with st.expander("📊 Model Evaluation Metrics"):
-    st.write("Accuracy:", accuracy)
-    st.write("Precision:", precision)
-    st.write("Recall:", recall)
-
-# Visualizing correlation matrix
-with st.expander("📈 Data Insights: Correlation Matrix"):
-    plt.figure(figsize=(10, 8))
-    correlation_matrix = df.corr()
-    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
-    plt.title("Correlation Matrix")
-    st.pyplot(plt)
 
 
 
