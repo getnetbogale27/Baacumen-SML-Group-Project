@@ -629,9 +629,9 @@ with st.sidebar:
         'No reason specified', 'Poor Product Quality', 'Too many ads', 
         'User Friendly Website', 'Poor Customer Service', 'Reasonable Price'], index=0)
 
-## Example button to confirm input submission
-# if st.button('Submit'):
-#     st.write('Input features submitted successfully!')
+# Example button to confirm input submission
+if st.button('Submit'):
+    st.write('Input features submitted successfully!')
 
 
 
@@ -650,132 +650,132 @@ with st.sidebar:
 
 
 
-# with st.expander('📈 Data visualization'):
-#     st.scatter_chart(data=df, x='Ch_age_mon', y='Care_age',
-#                      color='Nutrition_Status')
+with st.expander('📈 Data visualization'):
+    st.scatter_chart(data=df, x='Ch_age_mon', y='Care_age',
+                     color='Nutrition_Status')
 
 
-# # Split data for training and testing
-# X = df.iloc[:, 3:-1]  # Features (independent variables)
-# y = df['Nutrition_Status']  # Target (dependent variable)
-# X_train, X_test, y_train, y_test = train_test_split(
-#     X, y, test_size=0.3, random_state=42)
+# Split data for training and testing
+X = df.iloc[:, 3:-1]  # Features (independent variables)
+y = df['Nutrition_Status']  # Target (dependent variable)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42)
 
-# # Cache the model training
-
-
-# @st.cache_data
-# def train_model(X_train, y_train):
-#     model = RandomForestClassifier()
-#     model.fit(X_train, y_train)
-#     return model
+# Cache the model training
 
 
-# model = train_model(X_train, y_train)
-
-# # Prepare input data
-# X_columns = X.columns
-# input_data = encode_inputs(X_columns)
-
-# # Predict and display the result
-# if st.button('👉 Click Me to Predict Nutrition Status'):
-#     # Predict probabilities for each class
-#     prediction_proba = model.predict_proba(input_data)[0]
-
-#     # Predicted Probabilities Expander
-#     with st.expander('📊 Predicted Probabilities'):
-#         st.subheader('Predicted Probabilities')
-
-#         # Define the category labels
-#         categories = ['Normal (N)', 'Underweight Only (U)', 'Stunted Only (S)', 'Wasted Only (W)',
-#                       'Underweight and Stunted (US)', 'Underweight and Wasted (UW)',
-#                       'Stunted and Wasted (SW)', 'Underweight, Stunted and Wasted (USW)']
-
-#         # Create a DataFrame for displaying probabilities
-#         df_prediction_proba = pd.DataFrame({
-#             'Category': categories,
-#             'Probability': prediction_proba
-#         })
-
-#         # Display probabilities using Streamlit's dataframe component
-#         st.dataframe(df_prediction_proba,
-#                      column_config={
-#                          'Category': st.column_config.TextColumn('Category', width='medium'),
-#                          'Probability': st.column_config.ProgressColumn(
-#                              'Probability',
-#                              format='%f',
-#                              width='medium',
-#                              min_value=0,
-#                              max_value=1
-#                          )
-#                      }, hide_index=True)
-
-#         # Display the predicted category with the highest probability
-#         predicted_category = categories[np.argmax(prediction_proba)]
-#         st.success(f'Predicted Category: {predicted_category}')
-
-# # Model Evaluation Expander
-# with st.expander('🧠 Model Evaluation'):
-#     st.subheader('Model Evaluation')
-
-#     # Predict and evaluate the model
-#     y_pred = model.predict(X_test)
-
-#     # Display accuracy score
-#     st.write(f'Accuracy Score: {accuracy_score(y_test, y_pred):.2f}')
-
-#     # Display classification report
-#     st.write('Classification Report:')
-#     st.text(classification_report(y_test, y_pred))
+@st.cache_data
+def train_model(X_train, y_train):
+    model = RandomForestClassifier()
+    model.fit(X_train, y_train)
+    return model
 
 
-# # Feature Importance Expander
-# with st.expander('🏆 Feature Importance'):
-#     st.subheader('Feature Importance')
+model = train_model(X_train, y_train)
 
-#     # Get feature importances
-#     importances = model.feature_importances_
-#     indices = importances.argsort()[::-1]
-#     feature_names = X.columns[indices]
+# Prepare input data
+X_columns = X.columns
+input_data = encode_inputs(X_columns)
 
-#     # Create a figure and axis explicitly
-#     fig, ax = plt.subplots()
-#     ax.bar(range(X.shape[1]), importances[indices], align='center')
-#     ax.set_title('Feature Importances')
-#     ax.set_xticks(range(X.shape[1]))
-#     ax.set_xticklabels(feature_names, rotation=90)
-#     ax.set_xlim([-1, X.shape[1]])
+# Predict and display the result
+if st.button('👉 Click Me to Predict Nutrition Status'):
+    # Predict probabilities for each class
+    prediction_proba = model.predict_proba(input_data)[0]
 
-#     # Display the plot in Streamlit
-#     st.pyplot(fig)
+    # Predicted Probabilities Expander
+    with st.expander('📊 Predicted Probabilities'):
+        st.subheader('Predicted Probabilities')
 
-# # Generate predictions probabilities for the positive class
-# # Probabilities for the positive class
-# y_prob = model.predict_proba(X_test)[:, 1]
+        # Define the category labels
+        categories = ['Normal (N)', 'Underweight Only (U)', 'Stunted Only (S)', 'Wasted Only (W)',
+                      'Underweight and Stunted (US)', 'Underweight and Wasted (UW)',
+                      'Stunted and Wasted (SW)', 'Underweight, Stunted and Wasted (USW)']
 
-# # Compute ROC curve
-# fpr, tpr, thresholds = roc_curve(y_test, y_prob, pos_label=1)
-# roc_auc = auc(fpr, tpr)  # Compute the area under the ROC curve
+        # Create a DataFrame for displaying probabilities
+        df_prediction_proba = pd.DataFrame({
+            'Category': categories,
+            'Probability': prediction_proba
+        })
 
-# # Create the plot within the expander
-# with st.expander('📈 ROC Curve'):
-#     # Plot ROC curve
-#     fig, ax = plt.subplots()
-#     ax.plot(fpr, tpr, color='blue', lw=2,
-#             label=f'ROC curve (area = {roc_auc:.2f})')
-#     ax.plot([0, 1], [0, 1], color='grey', linestyle='--')
-#     ax.set_xlim([0.0, 1.0])
-#     ax.set_ylim([0.0, 1.05])
-#     ax.set_xlabel('False Positive Rate')
-#     ax.set_ylabel('True Positive Rate')
-#     ax.set_title('Receiver Operating Characteristic (ROC) Curve')
-#     ax.legend(loc='lower right')
+        # Display probabilities using Streamlit's dataframe component
+        st.dataframe(df_prediction_proba,
+                     column_config={
+                         'Category': st.column_config.TextColumn('Category', width='medium'),
+                         'Probability': st.column_config.ProgressColumn(
+                             'Probability',
+                             format='%f',
+                             width='medium',
+                             min_value=0,
+                             max_value=1
+                         )
+                     }, hide_index=True)
 
-#     # Display plot in Streamlit
-#     st.pyplot(fig)
+        # Display the predicted category with the highest probability
+        predicted_category = categories[np.argmax(prediction_proba)]
+        st.success(f'Predicted Category: {predicted_category}')
+
+# Model Evaluation Expander
+with st.expander('🧠 Model Evaluation'):
+    st.subheader('Model Evaluation')
+
+    # Predict and evaluate the model
+    y_pred = model.predict(X_test)
+
+    # Display accuracy score
+    st.write(f'Accuracy Score: {accuracy_score(y_test, y_pred):.2f}')
+
+    # Display classification report
+    st.write('Classification Report:')
+    st.text(classification_report(y_test, y_pred))
 
 
-# # Lasso
+# Feature Importance Expander
+with st.expander('🏆 Feature Importance'):
+    st.subheader('Feature Importance')
+
+    # Get feature importances
+    importances = model.feature_importances_
+    indices = importances.argsort()[::-1]
+    feature_names = X.columns[indices]
+
+    # Create a figure and axis explicitly
+    fig, ax = plt.subplots()
+    ax.bar(range(X.shape[1]), importances[indices], align='center')
+    ax.set_title('Feature Importances')
+    ax.set_xticks(range(X.shape[1]))
+    ax.set_xticklabels(feature_names, rotation=90)
+    ax.set_xlim([-1, X.shape[1]])
+
+    # Display the plot in Streamlit
+    st.pyplot(fig)
+
+# Generate predictions probabilities for the positive class
+# Probabilities for the positive class
+y_prob = model.predict_proba(X_test)[:, 1]
+
+# Compute ROC curve
+fpr, tpr, thresholds = roc_curve(y_test, y_prob, pos_label=1)
+roc_auc = auc(fpr, tpr)  # Compute the area under the ROC curve
+
+# Create the plot within the expander
+with st.expander('📈 ROC Curve'):
+    # Plot ROC curve
+    fig, ax = plt.subplots()
+    ax.plot(fpr, tpr, color='blue', lw=2,
+            label=f'ROC curve (area = {roc_auc:.2f})')
+    ax.plot([0, 1], [0, 1], color='grey', linestyle='--')
+    ax.set_xlim([0.0, 1.0])
+    ax.set_ylim([0.0, 1.05])
+    ax.set_xlabel('False Positive Rate')
+    ax.set_ylabel('True Positive Rate')
+    ax.set_title('Receiver Operating Characteristic (ROC) Curve')
+    ax.legend(loc='lower right')
+
+    # Display plot in Streamlit
+    st.pyplot(fig)
+
+
+# Lasso
 
 
 
