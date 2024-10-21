@@ -456,6 +456,7 @@ numerical_columns = df.select_dtypes(include=['number']).columns.tolist()
 #     st.pyplot(plt)
 
 with st.expander("Show Correlation Heatmap"):
+    filtered_numerical_columns = [col for col in numerical_columns if col != 'is_active']
     # Set up the matplotlib figure
     plt.figure(figsize=(12, 8))
     
