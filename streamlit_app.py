@@ -63,7 +63,7 @@ st.info(
 
 
 
-
+st.header(" Step 1: Data Preprocessing Pipeline")
 
 # Expanders for different data views
 with st.expander('🔍 Dataset Information'):
@@ -81,7 +81,7 @@ with st.expander('🔢 Raw data (first 5 rows)'):
 
 
     
-
+st.subheader("1.1 Handling Missing Data")
 # Step 1: Replace specific values with NaN
 missing_values = {
     'gender': ['Unknown'],
@@ -126,6 +126,7 @@ with st.expander('✅ Missing Data Summary (After Imputation)'):
 
 
 
+st.subheader("1.2 Data Type Correction")
 ## 1.2 Data Type Correction
 # Step 1: Convert 'joining_date' and 'last_visit_time' to datetime format
 df['joining_date'] = pd.to_datetime(df['joining_date'], errors='coerce')
@@ -140,6 +141,7 @@ with st.expander('🛠️ Data Types After Correction'):
     st.write(data_types_after_correction)
 
 
+st.subheader("1.3 Encoding Categorical Variables")
 # 1.3 Encoding Categorical Variables
 # Identify categorical columns for One-Hot Encoding
 categorical_columns_one_hot = [
@@ -156,7 +158,7 @@ with st.expander('🔠 One-Hot Encoded Data Sample'):
     st.write(data_one_hot_encoded.head())
 
 
-# 1.4 Outlier Detection & Handling
+st.subheader("1.4 Outlier Detection & Handling")
 # Function to detect and handle outliers using IQR
 def detect_outliers_iqr(df, column):
     if column not in df.columns:
@@ -240,8 +242,7 @@ with st.expander('📊 Boxplots for Outlier Visualization and Handling'):
 
 
 
-
-# 1.5 Feature Engineering
+st.subheader("1.5 Feature Engineering")
 # Feature Engineering
 df['recency'] = df['days_since_last_login']
 df['engagement_score'] = (df['avg_time_spent'] * 0.5 +
@@ -289,9 +290,8 @@ with st.expander("Show Newly Created Features"):
     ]].head())
 
 
-
-# Step 2: Exploratory Data Analysis (EDA) 
-# 2.1 Statistical Summaries
+st.header("Step 2: Exploratory Data Analysis (EDA)")
+st.subheader("2.1 Statistical Summaries")
 
 # Selecting numerical columns based on the provided DataFrame structure
 numerical_columns = [
@@ -325,7 +325,7 @@ with st.expander("Show Statistical Summaries"):
     st.dataframe(summary_stats_df)
 
 
-# 2.2 Visualizations
+st.subheader("2.2 Visualizations")
 # Set the style of seaborn
 sns.set(style="whitegrid")
 
@@ -489,7 +489,8 @@ segmentation_analysis = (
     .reset_index()
 )
 
-# 2.3 Customer Segmentation Analysis
+
+st.subheader("2.3 Customer Segmentation Analysis")
 with st.expander("Show Segmentation Analysis"):
     st.write("**Segmentation Analysis Data**")
     st.dataframe(segmentation_analysis)
@@ -502,9 +503,9 @@ with st.expander("Show Segmentation Analysis"):
     st.write(f"**Average Churn Rate:** {avg_churn_rate:.2%}")
 
 
-# Step 3: Feature Selection and Data Splitting
 
-# 3.1 Feature Selection (X and Y)
+st.header("Step 3: Feature Selection and Data Splitting")
+st.subheader("3.1 Feature Selection (X and Y)")
 churn_risk_score = df.pop('churn_risk_score')  # Remove the column
 df['churn_risk_score'] = churn_risk_score  # Append it to the end
 
