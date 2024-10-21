@@ -635,9 +635,9 @@ with st.sidebar:
         'No reason specified', 'Poor Product Quality', 'Too many ads', 
         'User Friendly Website', 'Poor Customer Service', 'Reasonable Price'], index=0)
 
-# Example button to confirm input submission
-if st.button('Submit'):
-    st.write('Input features submitted successfully!')
+## Example button to confirm input submission
+# if st.button('Submit'):
+#     st.write('Input features submitted successfully!')
 
 
 
