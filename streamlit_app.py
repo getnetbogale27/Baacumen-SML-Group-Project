@@ -20,7 +20,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.feature_selection import RFE, SelectKBest, f_classif
+from sklearn.feature_selection import RFE, SelectKBest, f_classif, VarianceThreshold
 from sklearn.linear_model import LassoCV
 from boruta import BorutaPy
 from sklearn.preprocessing import StandardScaler
@@ -565,29 +565,31 @@ with st.expander("🔄 Recursive Feature Elimination (RFE)"):
             X = pd.get_dummies(X, drop_first=True)
             st.write("After encoding, shape of X:", X.shape)
 
-        # Check for NaN values
-        if X.isnull().values.any() or y.isnull().any():
-            st.write("Warning: There are NaN values in X or y. Please handle them.")
-        else:
-            # Optional: Use stratified sampling for faster RFE
-            X_sample, _, y_sample, _ = train_test_split(X, y, 
-                                                        train_size=0.3, 
-                                                        stratify=y, 
-                                                        random_state=42)
-            st.write("Using a sample of data for RFE. Sample shape:", X_sample.shape)
+        # Remove low-variance features (optional)
+        threshold = 0.01  # Adjust threshold as needed
+        var_thresh = VarianceThreshold(threshold=threshold)
+        X_reduced = var_thresh.fit_transform(X)
+        st.write("After variance thresholding, shape of X:", X_reduced.shape)
 
-            # Initialize the model and RFE
-            model = RandomForestClassifier(n_jobs=-1, random_state=42)
-            rfe = RFE(model, n_features_to_select=10)
+        # Stratified sampling for RFE
+        X_sample, _, y_sample, _ = train_test_split(X_reduced, y, 
+                                                    train_size=0.3, 
+                                                    stratify=y, 
+                                                    random_state=42)
+        st.write("Using a sample of data for RFE. Sample shape:", X_sample.shape)
 
-            try:
-                # Fit RFE on the sample
-                fit = rfe.fit(X_sample, y_sample)
-                selected_features_rfe = X_sample.columns[fit.support_].tolist()
-                st.write("Selected Features using RFE:", selected_features_rfe)
-            except ValueError as e:
-                st.write(f"Error: {str(e)}")
-                st.write("Ensure that X and y have compatible shapes and data types.")
+        # Initialize model and RFE
+        model = RandomForestClassifier(n_estimators=50, n_jobs=-1, random_state=42)
+        rfe = RFE(model, n_features_to_select=10)
+
+        try:
+            # Fit RFE on the sample
+            fit = rfe.fit(X_sample, y_sample)
+            selected_features_rfe = X.columns[fit.support_].tolist()
+            st.write("Selected Features using RFE:", selected_features_rfe)
+        except ValueError as e:
+            st.write(f"Error: {str(e)}")
+            st.write("Ensure that X and y have compatible shapes and data types.")
     else:
         st.write("Cannot perform RFE: Ensure that X and y are defined correctly.")
 
