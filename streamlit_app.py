@@ -567,65 +567,6 @@ with st.expander('📊 Correlation Matrix'):
 
 
 
-# 3.2 Data Splitting
-
-# Preprocess X_raw
-def preprocess_data(X):
-    # Convert datetime columns to numeric features
-    for column in X.select_dtypes(include=['datetime64[ns]']).columns:
-        X[column] = X[column].astype(np.int64) // 10**9  # Convert to seconds since epoch
-
-    # Handle categorical variables using One-Hot Encoding
-    X_encoded = pd.get_dummies(X, drop_first=True)
-    
-    return X_encoded
-
-# Feature Selection using ExtraTreesRegressor
-def feature_importance(X, y):
-    # Preprocess the data
-    X_encoded = preprocess_data(X)
-
-    # Fit the model
-    model = ExtraTreesRegressor(n_estimators=100, random_state=42)
-    model.fit(X_encoded, y)
-
-    # Get feature importances
-    importances = model.feature_importances_
-    
-    # Print the feature importances
-    print("Feature importances:", importances)
-
-    # Create a DataFrame for better visualization
-    feature_importance_df = pd.DataFrame({
-        'Feature': X_encoded.columns,
-        'Importance': importances
-    })
-
-    # Sort the DataFrame by importance
-    feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
-
-    # Plotting the top 20 features
-    plt.figure(figsize=(12, 8))
-    feat_importances = pd.Series(importances, index=X_encoded.columns)
-    feat_importances.nlargest(20).plot(kind='barh', color='skyblue')
-    plt.title('Top 20 Feature Importances')
-    plt.xlabel('Importance Score')
-    plt.gca().invert_yaxis()  # To display the highest importance on top
-    plt.show()  # Display the plot
-
-    return feature_importance_df
-
-# Get feature importance
-importance_df = feature_importance(X, y)
-
-# Streamlit visualization
-with st.expander("Feature Importance using ExtraTreesRegressor"):
-    st.write(importance_df)
-
-    # Include the plot in Streamlit
-    st.pyplot(plt)
-
-
 
 
 
