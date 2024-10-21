@@ -547,7 +547,7 @@ for ratio in ratios:
 selected_dataset = list(datasets.keys())[0]  # Default selection
 
 # Display the selected dataset in an expander
-with st.expander(f'📊 {selected_dataset} (first 5 rows)'):
+with st.expander('Dataset Preview'):
     # Allow user to select a dataset to view
     selected_dataset = st.selectbox('Select a dataset to display:', list(datasets.keys()))
     st.write(datasets[selected_dataset].head(5))
