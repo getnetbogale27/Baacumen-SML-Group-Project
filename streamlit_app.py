@@ -417,8 +417,8 @@ with st.expander("Data Visualizations", expanded=True):
 
 #Outlier Detection and treat for newly computed features 
 # Function to detect and handle outliers using IQR
-detect_outliers_iqr(df, numerical_columns)
-detect_outliers_iqr(df, numerical_columns)
+# detect_outliers_iqr(df, numerical_columns)
+# detect_outliers_iqr(df, numerical_columns)
 
 # Create an expander for boxplot visualization
 with st.expander("Treating Outlier for newly computed features"):
