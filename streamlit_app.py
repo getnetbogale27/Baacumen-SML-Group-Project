@@ -24,6 +24,7 @@ from sklearn.feature_selection import RFE, SelectKBest, f_classif, VarianceThres
 from sklearn.linear_model import LassoCV
 from boruta import BorutaPy
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
 
 
@@ -615,6 +616,58 @@ with st.expander("🔄 Recursive Feature Elimination (RFE)"):
 #     fit = rfe.fit(X, y)
 #     selected_features_rfe = X.columns[fit.support_].tolist()
 #     st.write("Selected Features using RFE:", selected_features_rfe)
+
+
+
+# PCA for Feature Selection
+with st.expander("📉 PCA (Principal Component Analysis)"):
+    if y is not None and not X.empty:
+        # Display shape of X and y
+        st.write("Shape of X:", X.shape)
+        st.write("Shape of y:", y.shape)
+
+        # Identify non-numeric columns
+        non_numeric_cols = X.select_dtypes(exclude=[np.number]).columns.tolist()
+        if non_numeric_cols:
+            st.write(f"Non-numeric columns detected: {non_numeric_cols}")
+
+            # Apply one-hot encoding to non-numeric columns
+            X = pd.get_dummies(X, drop_first=True)
+            st.write("After encoding, shape of X:", X.shape)
+
+        # Standardize the features before applying PCA
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        st.write("Features standardized.")
+
+        # Initialize PCA
+        n_components = min(10, X.shape[1])  # Limit components to 10 or less
+        pca = PCA(n_components=n_components)
+
+        try:
+            # Fit PCA and transform X
+            X_pca = pca.fit_transform(X_scaled)
+            explained_variance = pca.explained_variance_ratio_
+            st.write(f"Explained Variance Ratio of top {n_components} components:", explained_variance)
+
+            # Display cumulative explained variance
+            cumulative_variance = explained_variance.cumsum()
+            st.write("Cumulative Explained Variance:", cumulative_variance)
+
+            # Select components explaining at least 95% of variance
+            selected_components = (cumulative_variance >= 0.95).argmax() + 1
+            st.write(f"Number of components explaining 95% variance: {selected_components}")
+
+            # If needed, apply PCA with the selected number of components
+            pca_final = PCA(n_components=selected_components)
+            X_pca_final = pca_final.fit_transform(X_scaled)
+            st.write(f"After PCA, shape of X: {X_pca_final.shape}")
+
+        except ValueError as e:
+            st.error(f"Error during PCA: {str(e)}")
+
+    else:
+        st.warning("Cannot perform PCA: Ensure that X and y are defined correctly.")
 
 
 
