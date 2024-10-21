@@ -618,30 +618,38 @@ with st.expander("🔄 Recursive Feature Elimination (RFE)"):
 
 
 
+# SelectKBest
 with st.expander("⭐ SelectKBest"):
-    # Step 1: Check for non-numeric columns
-    if not np.issubdtype(X.dtypes.values, np.number):
-        st.write("Non-numeric columns detected, applying one-hot encoding...")
-        X = pd.get_dummies(X, drop_first=True)
+    if y is not None and not X.empty:
+        # Display shape of X and y
+        st.write("Shape of X:", X.shape)
+        st.write("Shape of y:", y.shape)
 
-    # Step 2: Handle any missing values
-    if X.isna().sum().any():
-        st.write("Missing values detected, replacing with 0...")
-        X = X.fillna(0)
+        # Check for non-numeric columns
+        non_numeric_cols = X.select_dtypes(exclude=[np.number]).columns.tolist()
+        if non_numeric_cols:
+            st.write(f"Non-numeric columns detected: {non_numeric_cols}")
 
-    # Step 3: Apply SelectKBest for feature selection
-    try:
-        selector = SelectKBest(score_func=f_classif, k=10)
-        X_selected_kbest = selector.fit_transform(X, y)
+            # Apply one-hot encoding to non-numeric columns
+            X = pd.get_dummies(X, drop_first=True)
+            st.write("After encoding, shape of X:", X.shape)
 
-        # Get selected feature names
-        selected_indices_kbest = selector.get_support(indices=True)
-        selected_features_kbest = X.columns[selected_indices_kbest].tolist()
-
-        # Display the selected features
-        st.write("Selected Features using SelectKBest:", selected_features_kbest)
-    except Exception as e:
-        st.error(f"An error occurred: {str(e)}")
+        # Ensure X is numeric before using SelectKBest
+        if not X.select_dtypes(exclude=[np.number]).empty:
+            st.write("X still contains non-numeric data after encoding.")
+        else:
+            # Apply SelectKBest
+            try:
+                selector = SelectKBest(score_func=f_classif, k=10)
+                X_selected_kbest = selector.fit_transform(X, y)
+                selected_indices_kbest = selector.get_support(indices=True)
+                selected_features_kbest = X.columns[selected_indices_kbest].tolist()
+                st.write("Selected Features using SelectKBest:", selected_features_kbest)
+            except Exception as e:
+                st.write(f"Error during SelectKBest: {str(e)}")
+    else:
+        st.write("Cannot perform SelectKBest: Ensure that X and y are defined correctly.")
+        
 
 
 # # SelectKBest
