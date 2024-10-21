@@ -517,8 +517,12 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     st.write(y.head(5).reset_index(drop=True))
 
 
+# Data Spliting
+# Splitting the dataset into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
 
-
+# Display sizes of the splits
+st.write(f"Training set size: {X_train.shape[0]}, Test set size: {X_test.shape[0]}")
 
 
 
