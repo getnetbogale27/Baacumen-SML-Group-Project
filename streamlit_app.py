@@ -521,7 +521,6 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 # Data Splitting
-# Define split ratios
 ratios = [0.1, 0.15, 0.2, 0.25, 0.3]
 datasets = {}
 
@@ -542,26 +541,19 @@ for ratio in ratios:
 
     # Store datasets in the dictionary for displaying
     datasets[f'Train set {int((1-ratio)*100)}%'] = train_df
+    datasets[f'Test set {int(ratio*100)}%'] = test_df
 
 # Initialize the selected dataset before displaying
 selected_dataset = list(datasets.keys())[0]  # Default selection
 
-# Display the selected dataset in an expander with a new name
+# Display the selected dataset in a single expander
 with st.expander('Dataset Preview'):
     # Allow user to select a dataset to view
     selected_dataset = st.selectbox('Select a dataset to display:', list(datasets.keys()))
     
-    # Display the training set
-    st.subheader(f'{selected_dataset} (first 5 rows)')
+    # Display the selected dataset
+    st.write(f"**{selected_dataset} (first 5 rows)**")
     st.write(datasets[selected_dataset].head(5))
-
-    # Display the test set if the selected dataset is a training set
-    if 'Train set' in selected_dataset:
-        test_set_key = selected_dataset.replace('Train', 'Test')  # Get corresponding test set key
-        if test_set_key in datasets:
-            st.subheader(f'Test set {test_set_key.split(" ")[-1]} (first 5 rows)')
-            st.write(datasets[test_set_key].head(5))
-
 
 
 
