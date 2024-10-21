@@ -414,9 +414,11 @@ with st.expander("Data Visualizations", expanded=True):
 
 
 
+
 # Outlier Detection and treat for newly computed features
 # Run outlier detection first
 # detect_outliers_iqr(df, numerical_columns)
+detect_outliers_iqr(df, numerical_columns)
 
 # Create an expander for boxplot visualization
 with st.expander("Treating Outlier for newly computed features"):
@@ -440,9 +442,6 @@ with st.expander("Treating Outlier for newly computed features"):
 
 # Automatically detect numerical columns
 numerical_columns = df.select_dtypes(include=['number']).columns.tolist()
-
-# Streamlit app
-st.title("Correlation Heatmap")
 
 # Create an expander for the correlation heatmap
 with st.expander("Show Correlation Heatmap"):
