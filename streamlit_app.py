@@ -79,6 +79,49 @@ with st.expander('🔢 Raw data (first 5 rows)'):
 ## Data Preprocessing
 ## 1.1 Handling Missing Data (5 Marks)
 
+# # Step 1: Replace specific values with NaN
+# missing_values = {
+#     'gender': ['Unknown'],
+#     'joined_through_referral': ['?'],
+#     'medium_of_operation': ['?'],
+#     'churn_risk_score': [-1]
+# }
+
+# # Replace specific values with NaN
+# df.replace(missing_values, np.nan, inplace=True)
+
+# # Replace -999 globally with NaN
+# df.replace(-999, np.nan, inplace=True)
+
+# # Step 2: Display missing data summary before imputation
+# with st.expander('⚠️ Missing Data Summary (Before Imputation)'):
+#     st.write(df.isnull().sum())
+
+# # Step 3: Identify Categorical and Continuous Columns
+# categorical_cols = [
+#     'gender', 'region_category', 'joined_through_referral', 
+#     'preferred_offer_types', 'medium_of_operation'
+# ]
+
+# continuous_cols = [
+#     'points_in_wallet', 'churn_risk_score'
+# ]
+
+# # Step 4: Impute Missing Values for Categorical Columns (with Mode)
+# for col in categorical_cols:
+#     mode_value = df[col].mode()[0]  # Get the most frequent value
+#     df[col].fillna(mode_value, inplace=True)
+
+# # Step 5: Impute Missing Values for Continuous Columns (with Median)
+# for col in continuous_cols:
+#     median_value = df[col].median()  # Get the median value
+#     df[col].fillna(median_value, inplace=True)
+
+# # Step 6: Display missing data summary after imputation
+# with st.expander('✅ Missing Data Summary (After Imputation)'):
+#     st.write(df.isnull().sum())
+    
+
 # Step 1: Replace specific values with NaN
 missing_values = {
     'gender': ['Unknown'],
@@ -87,15 +130,12 @@ missing_values = {
     'churn_risk_score': [-1]
 }
 
-# Replace specific values with NaN
-df.replace(missing_values, np.nan, inplace=True)
-
-# Replace -999 globally with NaN
-df.replace(-999, np.nan, inplace=True)
+# Replace values with NaN
+df.replace({**missing_values, -999: np.nan}, inplace=True)
 
 # Step 2: Display missing data summary before imputation
 with st.expander('⚠️ Missing Data Summary (Before Imputation)'):
-    st.write(df.isnull().sum())
+    st.dataframe(df.isnull().sum().reset_index(name='Missing Values'))
 
 # Step 3: Identify Categorical and Continuous Columns
 categorical_cols = [
@@ -109,7 +149,10 @@ continuous_cols = [
 
 # Step 4: Impute Missing Values for Categorical Columns (with Mode)
 for col in categorical_cols:
-    mode_value = df[col].mode()[0]  # Get the most frequent value
+    if not df[col].mode().empty:
+        mode_value = df[col].mode()[0]
+    else:
+        mode_value = 'Unknown'
     df[col].fillna(mode_value, inplace=True)
 
 # Step 5: Impute Missing Values for Continuous Columns (with Median)
@@ -119,8 +162,8 @@ for col in continuous_cols:
 
 # Step 6: Display missing data summary after imputation
 with st.expander('✅ Missing Data Summary (After Imputation)'):
-    st.write(df.isnull().sum())
-    
+    st.dataframe(df.isnull().sum().reset_index(name='Missing Values'))
+
 
 
 ## 1.2 Data Type Correction
