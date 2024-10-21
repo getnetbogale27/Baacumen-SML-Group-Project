@@ -51,7 +51,7 @@ df = load_data()
 st.title('🤖 Supervised ML App')
 # List of Authors
 st.write("**Authors:** Getnet B. (PhD Candidate), Bezawit B., Tadele B., "
-         "Selam, Michael A.")
+         "Selam S., Michael A.")
 
 st.info(
     "The primary objective of this project is to build a predictive model that calculates the Churn "
