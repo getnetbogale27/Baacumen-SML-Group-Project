@@ -550,13 +550,37 @@ with st.expander("📊 Correlation Matrix"):
 # Recursive Feature Elimination (RFE)
 with st.expander("🔄 Recursive Feature Elimination (RFE)"):
     if y is not None and not X.empty:
-        model = RandomForestClassifier()
-        rfe = RFE(model, n_features_to_select=10)
-        fit = rfe.fit(X, y)
-        selected_features_rfe = X.columns[fit.support_].tolist()
-        st.write("Selected Features using RFE:", selected_features_rfe)
+        # Check data types and shapes
+        st.write("Shape of X:", X.shape)
+        st.write("Shape of y:", y.shape)
+        
+        # Check for NaN values
+        if X.isnull().values.any() or y.isnull().any():
+            st.write("Warning: There are NaN values in X or y. Please handle them before proceeding.")
+        else:
+            model = RandomForestClassifier()
+            rfe = RFE(model, n_features_to_select=10)
+            try:
+                fit = rfe.fit(X, y)
+                selected_features_rfe = X.columns[fit.support_].tolist()
+                st.write("Selected Features using RFE:", selected_features_rfe)
+            except ValueError as e:
+                st.write(f"ValueError: {str(e)}")
+                st.write("Ensure that X and y are defined correctly and have compatible shapes.")
     else:
         st.write("Cannot perform RFE: Ensure that X and y are defined correctly.")
+
+
+# # Recursive Feature Elimination (RFE)
+# with st.expander("🔄 Recursive Feature Elimination (RFE)"):
+#     if y is not None and not X.empty:
+#         model = RandomForestClassifier()
+#         rfe = RFE(model, n_features_to_select=10)
+#         fit = rfe.fit(X, y)
+#         selected_features_rfe = X.columns[fit.support_].tolist()
+#         st.write("Selected Features using RFE:", selected_features_rfe)
+#     else:
+#         st.write("Cannot perform RFE: Ensure that X and y are defined correctly.")
 
 
 # # Recursive Feature Elimination (RFE)
