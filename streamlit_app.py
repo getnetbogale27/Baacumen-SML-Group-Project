@@ -485,9 +485,8 @@ with st.expander("Show Segmentation Analysis"):
 
 
 # Step 3: Feature Selection and Data Splitting
-# 3.2 Data Splitting
 
-
+# 3.2 Data Splitting (X and Y)
 churn_risk_score = df.pop('churn_risk_score')  # Remove the column
 df['churn_risk_score'] = churn_risk_score  # Append it to the end
 
@@ -495,12 +494,16 @@ with st.expander('🔢 Raw data (first 5 rows) including newly computed features
     st.write(df.head(5))  # Display first 5 rows of raw data
 
 with st.expander('🧩 X (independent variables) (first 5 rows)'):
-    X_raw = df.iloc[:, 2:-1]  # Adjusted to start from the 3rd column (index 2)
+    X_raw = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
     st.write(X_raw.head(5)) 
 
 with st.expander('🎯 Y (dependent variable) (first 5 rows)'):
     y_raw = df.iloc[:, -1]  
     st.write(y_raw.head(5).reset_index(drop=True))
+
+
+
+
 
 
 
