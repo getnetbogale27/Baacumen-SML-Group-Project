@@ -390,22 +390,22 @@ with st.expander("Data Visualizations", expanded=True):
     # Categorical Visualizations
     plot_data(df, categorical_columns, plot_type='count')
 
-    # # Numerical Visualizations: Histograms
+    ## Numerical Visualizations: Histograms
     # plot_data(df, numerical_columns, plot_type='hist')
 
     # Numerical Visualizations: Box plots
     plot_data(df, numerical_columns, plot_type='box')
 
-    # Pair Plot
-    fig = sns.pairplot(df[numerical_columns])
-    st.pyplot(fig)
+    ## Pair Plot
+    # fig = sns.pairplot(df[numerical_columns])
+    # st.pyplot(fig)
 
     # Correlation Heatmap
     plt.figure(figsize=(12, 10))
     correlation_matrix = df[numerical_columns].corr()
     sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm', square=True)
-    # plt.title('Correlation Heatmap of Numerical Features')
-    st.pyplot(plt) 
+    plt.title('Correlation Heatmap of Numerical Features')
+    st.pyplot(plt)  # Pass the current plt figure to st.pyplot
 
 
 
