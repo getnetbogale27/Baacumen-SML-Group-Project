@@ -505,7 +505,10 @@ with st.expander("Show Segmentation Analysis"):
 
 
 st.header("Step 3: Feature Selection and Data Splitting")
-st.subheader("3.1 Feature Selection (X and Y)")
+st.subheader("3.1 Feature Selection")
+
+
+st.subheader("3.2 Data Splitting")
 churn_risk_score = df.pop('churn_risk_score')  # Remove the column
 df['churn_risk_score'] = churn_risk_score  # Append it to the end
 
@@ -574,7 +577,8 @@ with st.expander('Dataset Previews (Train Vs Test)'):
         st.write(datasets[test_set_key].head(5))
 
 
-
+st.header("Step 4: Model Building")
+st.subheader("4.1 Algorithm Selection")
 
 
 
