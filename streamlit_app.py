@@ -498,12 +498,12 @@ with st.expander('🔢 Raw data (first 5 rows) including newly computed features
     st.write(df.head(5))  # Display first 5 rows of raw data
 
 with st.expander('🧩 X (independent variables) (first 5 rows)'):
-    X_raw = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
-    st.write(X_raw.head(5)) 
+    X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
+    st.write(X.head(5)) 
 
 with st.expander('🎯 Y (dependent variable) (first 5 rows)'):
-    y_raw = df.iloc[:, -1]  
-    st.write(y_raw.head(5).reset_index(drop=True))
+    y = df.iloc[:, -1]  
+    st.write(y.head(5).reset_index(drop=True))
 
 
 
