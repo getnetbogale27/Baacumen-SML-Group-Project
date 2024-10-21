@@ -518,52 +518,50 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     st.write(y.head(5).reset_index(drop=True))
 
 
-
 # Feature Selection Section
-with st.expander("🔍 Feature Selection Methods"):
-    
-    # Correlation Matrix
-    with st.expander("📊 Correlation Matrix"):
-        correlation_matrix = df.corr()
-        st.write(correlation_matrix)
-        threshold = 0.1  # Change as needed
-        selected_features_corr = correlation_matrix[abs(correlation_matrix['churn_risk_score']) > threshold].index.tolist()
-        selected_features_corr.remove('churn_risk_score')  # Remove target variable
-        st.write("Selected Features based on Correlation:", selected_features_corr)
+st.header("🔍 Feature Selection Methods")
 
-    # Recursive Feature Elimination (RFE)
-    with st.expander("🔄 Recursive Feature Elimination (RFE)"):
-        model = RandomForestClassifier()
-        rfe = RFE(model, n_features_to_select=10)
-        fit = rfe.fit(X, y)
-        selected_features_rfe = X.columns[fit.support_].tolist()
-        st.write("Selected Features using RFE:", selected_features_rfe)
+# Correlation Matrix
+with st.expander("📊 Correlation Matrix"):
+    correlation_matrix = df.corr()
+    st.write(correlation_matrix)
+    threshold = 0.1  # Change as needed
+    selected_features_corr = correlation_matrix[abs(correlation_matrix['churn_risk_score']) > threshold].index.tolist()
+    selected_features_corr.remove('churn_risk_score')  # Remove target variable
+    st.write("Selected Features based on Correlation:", selected_features_corr)
 
-    # SelectKBest
-    with st.expander("⭐ SelectKBest"):
-        selector = SelectKBest(score_func=f_classif, k=10)
-        X_selected_kbest = selector.fit_transform(X, y)
-        selected_indices_kbest = selector.get_support(indices=True)
-        selected_features_kbest = X.columns[selected_indices_kbest].tolist()
-        st.write("Selected Features using SelectKBest:", selected_features_kbest)
+# Recursive Feature Elimination (RFE)
+with st.expander("🔄 Recursive Feature Elimination (RFE)"):
+    model = RandomForestClassifier()
+    rfe = RFE(model, n_features_to_select=10)
+    fit = rfe.fit(X, y)
+    selected_features_rfe = X.columns[fit.support_].tolist()
+    st.write("Selected Features using RFE:", selected_features_rfe)
 
-    # Lasso Regularization
-    with st.expander("🧩 Lasso Regularization"):
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(X)
-        lasso = LassoCV(alphas=[0.01, 0.1, 1.0, 10.0], cv=5)
-        lasso.fit(X_scaled, y)
-        selected_features_lasso = X.columns[lasso.coef_ != 0].tolist()
-        st.write("Selected Features using Lasso:", selected_features_lasso)
+# SelectKBest
+with st.expander("⭐ SelectKBest"):
+    selector = SelectKBest(score_func=f_classif, k=10)
+    X_selected_kbest = selector.fit_transform(X, y)
+    selected_indices_kbest = selector.get_support(indices=True)
+    selected_features_kbest = X.columns[selected_indices_kbest].tolist()
+    st.write("Selected Features using SelectKBest:", selected_features_kbest)
 
-    # Boruta
-    with st.expander("🌟 Boruta"):
-        rf = RandomForestClassifier(n_jobs=-1, class_weight='balanced', max_depth=5)
-        boruta_selector = BorutaPy(estimator=rf, n_estimators='auto', verbose=2, random_state=42)
-        boruta_selector.fit(X.values, y.values)
-        selected_features_boruta = X.columns[boruta_selector.support_].tolist()
-        st.write("Selected Features using Boruta:", selected_features_boruta)
+# Lasso Regularization
+with st.expander("🧩 Lasso Regularization"):
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    lasso = LassoCV(alphas=[0.01, 0.1, 1.0, 10.0], cv=5)
+    lasso.fit(X_scaled, y)
+    selected_features_lasso = X.columns[lasso.coef_ != 0].tolist()
+    st.write("Selected Features using Lasso:", selected_features_lasso)
 
+# Boruta
+with st.expander("🌟 Boruta"):
+    rf = RandomForestClassifier(n_jobs=-1, class_weight='balanced', max_depth=5)
+    boruta_selector = BorutaPy(estimator=rf, n_estimators='auto', verbose=2, random_state=42)
+    boruta_selector.fit(X.values, y.values)
+    selected_features_boruta = X.columns[boruta_selector.support_].tolist()
+    st.write("Selected Features using Boruta:", selected_features_boruta)
 
 
 
