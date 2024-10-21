@@ -550,7 +550,7 @@ selected_dataset = list(datasets.keys())[0]  # Default selection for training se
 # Display both training and testing datasets in one expander
 with st.expander('Dataset Previews (Train Vs Test)'):
     # Allow user to select a dataset to view
-    selected_dataset = st.selectbox('Select a dataset to display:', list(datasets.keys()))
+    selected_dataset = st.selectbox('Select a training dataset here to display the test data authomatically displayed:', list(datasets.keys()))
     
     # Display the selected dataset
     st.write(f"**{selected_dataset} Preview:**")
