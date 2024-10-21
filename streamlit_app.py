@@ -518,35 +518,34 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 # Data Spliting
-# Splitting the dataset into different training and test sets
-split_ratios = [0.1, 0.15, 0.2, 0.25, 0.3]  # Test sizes for 90:10, 85:15, 80:20, 75:25, 70:30
+# Define split ratios
+ratios = [0.1, 0.15, 0.2, 0.25, 0.3]
 datasets = {}
 
-for ratio in split_ratios:
-    test_size = ratio
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, stratify=y, random_state=42)
-    
-    # Save the datasets
-    datasets[f'Train ({100 - (test_size * 100)}%)'], datasets[f'Test ({test_size * 100}%)'] = (X_train, X_test, y_train, y_test)
+# Loop through each ratio to split and save datasets
+for ratio in ratios:
+    # Splitting the dataset
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=ratio, stratify=y, random_state=42)
 
-    # Display the selected dataset in the expander
-    with st.expander(f'Dataset Split {100 - (test_size * 100)}:{test_size * 100}'):
-        st.write('### Training Data (First 5 Rows):')
-        st.write(X_train.head())
-        st.write('### Test Data (First 5 Rows):')
-        st.write(X_test.head())
+    # Create DataFrames for training and testing sets
+    train_df = pd.DataFrame(X_train)
+    train_df['churn_risk_score'] = y_train.values
+    test_df = pd.DataFrame(X_test)
+    test_df['churn_risk_score'] = y_test.values
 
-# Optional: Save the datasets as CSV files
-for key, value in datasets.items():
-    X_train, X_test, y_train, y_test = value
-    X_train.to_csv(f'X_train_{key}.csv', index=False)
-    X_test.to_csv(f'X_test_{key}.csv', index=False)
-    y_train.to_csv(f'y_train_{key}.csv', index=False)
-    y_test.to_csv(f'y_test_{key}.csv', index=False)
+    # Save datasets to CSV files
+    train_df.to_csv(f'train_set_{int((1-ratio)*100)}.csv', index=False)
+    test_df.to_csv(f'test_set_{int(ratio*100)}.csv', index=False)
 
-# Inform the user that datasets have been saved
-st.success("Datasets have been saved successfully!")
+    # Store datasets in the dictionary for displaying
+    datasets[f'Train set {int((1-ratio)*100)}%'] = train_df
 
+# Allow user to select a dataset to view
+selected_dataset = st.selectbox('Select a dataset to display:', list(datasets.keys()))
+
+# Display the selected dataset in an expander
+with st.expander(f'📊 {selected_dataset} (first 5 rows)'):
+    st.write(datasets[selected_dataset].head(5))
 
 
 
