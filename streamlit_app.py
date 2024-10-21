@@ -544,20 +544,17 @@ for ratio in ratios:
     datasets[f'Train set {int((1-ratio)*100)}%'] = train_df
     datasets[f'Test set {int(ratio*100)}%'] = test_df
 
-# Display the datasets in a single expander
-with st.expander('Dataset Previews'):
-    # Allow user to select a training dataset to view
-    selected_train_dataset = st.selectbox('Select a training dataset to display:', 
-                                           [key for key in datasets.keys() if 'Train' in key])
-    st.write(f"**Training Dataset ({selected_train_dataset})**")
-    st.write(datasets[selected_train_dataset].head(5))
+# Initialize the selected dataset before displaying
+selected_dataset = list(datasets.keys())[0]  # Default selection
 
-    # Allow user to select a test dataset to view
-    selected_test_dataset = st.selectbox('Select a test dataset to display:', 
-                                          [key for key in datasets.keys() if 'Test' in key])
-    st.write(f"**Testing Dataset ({selected_test_dataset})**")
-    st.write(datasets[selected_test_dataset].head(5))
-
+# Display the selected dataset in a single expander
+with st.expander('Dataset Preview'):
+    # Allow user to select a dataset to view
+    selected_dataset = st.selectbox('Select a dataset to display:', list(datasets.keys()))
+    
+    # Display the selected dataset
+    st.write(f"**{selected_dataset} (first 5 rows)**")
+    st.write(datasets[selected_dataset].head(5))
 
 
 
