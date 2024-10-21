@@ -553,11 +553,21 @@ with st.expander("🔄 Recursive Feature Elimination (RFE)"):
         # Check data types and shapes
         st.write("Shape of X:", X.shape)
         st.write("Shape of y:", y.shape)
-        
-        # Check for NaN values
+
+        # Identify non-numeric columns
+        non_numeric_cols = X.select_dtypes(exclude=[np.number]).columns.tolist()
+        if non_numeric_cols:
+            st.write(f"Non-numeric columns detected: {non_numeric_cols}")
+
+            # Optionally, apply one-hot encoding
+            X = pd.get_dummies(X, drop_first=True)
+            st.write("After encoding, shape of X:", X.shape)
+
+        # Check again for NaN values
         if X.isnull().values.any() or y.isnull().any():
-            st.write("Warning: There are NaN values in X or y. Please handle them before proceeding.")
+            st.write("Warning: There are NaN values in X or y. Please handle them.")
         else:
+            # Fit the RFE model
             model = RandomForestClassifier()
             rfe = RFE(model, n_features_to_select=10)
             try:
@@ -566,9 +576,10 @@ with st.expander("🔄 Recursive Feature Elimination (RFE)"):
                 st.write("Selected Features using RFE:", selected_features_rfe)
             except ValueError as e:
                 st.write(f"ValueError: {str(e)}")
-                st.write("Ensure that X and y are defined correctly and have compatible shapes.")
+                st.write("Ensure that X and y have compatible shapes and types.")
     else:
         st.write("Cannot perform RFE: Ensure that X and y are defined correctly.")
+
 
 
 # # Recursive Feature Elimination (RFE)
