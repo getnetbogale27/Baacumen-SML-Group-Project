@@ -79,7 +79,7 @@ with st.expander('🔢 Raw data (first 5 rows)'):
 ## Data Preprocessing
 ## 1.1 Handling Missing Data (5 Marks)
 
-# Define specific values to replace with NaN
+# Step 1: Replace specific values with NaN
 missing_values = {
     'gender': ['Unknown'],
     'joined_through_referral': ['?'],
@@ -87,46 +87,40 @@ missing_values = {
     'churn_risk_score': [-1]
 }
 
-# Replace these specified values with NaN
+# Replace specific values with NaN
 df.replace(missing_values, np.nan, inplace=True)
-# Replace -999 globally across the entire DataFrame
+
+# Replace -999 globally with NaN
 df.replace(-999, np.nan, inplace=True)
 
-# Capture the missing data summary
-missing_data_summary = df.isnull().sum()
-
-# Create an expander to show missing data summary
+# Step 2: Display missing data summary before imputation
 with st.expander('⚠️ Missing Data Summary (Before Imputation)'):
-    st.write(missing_data_summary)
-    # st.write(data.isnull().sum())
+    st.write(df.isnull().sum())
 
-
-# Treat for missing values
-# Step 1: Define specific values to replace with NaN
-# Allready we done previously
-
-# Step 2: Handle Categorical Columns
+# Step 3: Identify Categorical and Continuous Columns
 categorical_cols = [
     'gender', 'region_category', 'joined_through_referral', 
     'preferred_offer_types', 'medium_of_operation'
 ]
 
+continuous_cols = [
+    'points_in_wallet', 'churn_risk_score'
+]
+
+# Step 4: Impute Missing Values for Categorical Columns (with Mode)
 for col in categorical_cols:
-    if col in ['joined_through_referral', 'medium_of_operation']:
-        # Impute with 'Unknown'
-        df[col].fillna('Unknown', inplace=True)
-    else:
-        # Impute with mode (most frequent value)
-        mode_value = df[col].mode()[0]
-        df[col].fillna(mode_value, inplace=True)
+    mode_value = df[col].mode()[0]  # Get the most frequent value
+    df[col].fillna(mode_value, inplace=True)
 
-# Step 3: Handle Numerical Columns
-df['points_in_wallet'].fillna(df['points_in_wallet'].median(), inplace=True)
-df['churn_risk_score'].fillna(df['churn_risk_score'].median(), inplace=True)
+# Step 5: Impute Missing Values for Continuous Columns (with Median)
+for col in continuous_cols:
+    median_value = df[col].median()  # Get the median value
+    df[col].fillna(median_value, inplace=True)
 
-# Expander 2: Show missing data summary after imputation
+# Step 6: Display missing data summary after imputation
 with st.expander('✅ Missing Data Summary (After Imputation)'):
     st.write(df.isnull().sum())
+    
 
 
 ## 1.2 Data Type Correction
