@@ -546,18 +546,21 @@ for ratio in ratios:
 # Initialize the selected dataset before displaying
 selected_dataset = list(datasets.keys())[0]  # Default selection
 
+# Display the selected dataset in an expander with a new name
 with st.expander('Dataset Preview'):
     # Allow user to select a dataset to view
     selected_dataset = st.selectbox('Select a dataset to display:', list(datasets.keys()))
-
-    # Display training data
-    train_data, test_data = datasets[selected_dataset]
-    st.write(f"**Training Set ({selected_dataset} - First 5 Rows)**")
-    st.write(train_data.head(5))
     
-    # Display testing data
-    st.write(f"**Testing Set ({selected_dataset} - First 5 Rows)**")
-    st.write(test_data.head(5))
+    # Display the training set
+    st.subheader(f'{selected_dataset} (first 5 rows)')
+    st.write(datasets[selected_dataset].head(5))
+
+    # Display the test set if the selected dataset is a training set
+    if 'Train set' in selected_dataset:
+        test_set_key = selected_dataset.replace('Train', 'Test')  # Get corresponding test set key
+        if test_set_key in datasets:
+            st.subheader(f'Test set {test_set_key.split(" ")[-1]} (first 5 rows)')
+            st.write(datasets[test_set_key].head(5))
 
 
 
