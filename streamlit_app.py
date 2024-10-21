@@ -548,7 +548,7 @@ for ratio in ratios:
 selected_dataset = list(datasets.keys())[0]  # Default selection for training set
 
 # Display both training and testing datasets in one expander
-with st.expander('Dataset Previews'):
+with st.expander('Dataset Previews (Train Vs Test)'):
     # Allow user to select a dataset to view
     selected_dataset = st.selectbox('Select a dataset to display:', list(datasets.keys()))
     
