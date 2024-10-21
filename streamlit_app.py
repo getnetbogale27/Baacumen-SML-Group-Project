@@ -528,16 +528,28 @@ with st.expander("📊 Correlation Matrix"):
     # Select only numeric columns for correlation
     numeric_df = df.select_dtypes(include=[np.number])
     
-    if not numeric_df.empty:
-        correlation_matrix = numeric_df.corr()
-        st.write(correlation_matrix)
-        
-        threshold = 0.1  # Change as needed
-        selected_features_corr = correlation_matrix[abs(correlation_matrix['churn_risk_score']) > threshold].index.tolist()
-        selected_features_corr.remove('churn_risk_score')  # Remove target variable
-        st.write("Selected Features based on Correlation:", selected_features_corr)
+    # Check if 'churn_risk_score' exists in the original DataFrame
+    if 'churn_risk_score' in df.columns:
+        if not numeric_df.empty:
+            correlation_matrix = numeric_df.corr()
+            st.write(correlation_matrix)
+            
+            # Debugging: Print available columns in the correlation matrix
+            st.write("Available columns in the correlation matrix:", correlation_matrix.columns.tolist())
+
+            threshold = 0.1  # Change as needed
+            
+            # Check if 'churn_risk_score' exists in the correlation matrix
+            if 'churn_risk_score' in correlation_matrix.columns:
+                selected_features_corr = correlation_matrix[abs(correlation_matrix['churn_risk_score']) > threshold].index.tolist()
+                selected_features_corr.remove('churn_risk_score')  # Remove target variable
+                st.write("Selected Features based on Correlation:", selected_features_corr)
+            else:
+                st.write("'churn_risk_score' is not in the correlation matrix.")
+        else:
+            st.write("No numeric columns available for correlation.")
     else:
-        st.write("No numeric columns available for correlation.")
+        st.write("'churn_risk_score' does not exist in the DataFrame.")
 
 
 
