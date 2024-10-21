@@ -517,7 +517,7 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     st.write(y.head(5).reset_index(drop=True))
 
 
-# Data Spliting
+# Data Splitting
 # Define split ratios
 ratios = [0.1, 0.15, 0.2, 0.25, 0.3]
 datasets = {}
@@ -540,11 +540,13 @@ for ratio in ratios:
     # Store datasets in the dictionary for displaying
     datasets[f'Train set {int((1-ratio)*100)}%'] = train_df
 
-# Allow user to select a dataset to view
-selected_dataset = st.selectbox('Select a dataset to display:', list(datasets.keys()))
+# Initialize the selected dataset before displaying
+selected_dataset = list(datasets.keys())[0]  # Default selection
 
 # Display the selected dataset in an expander
 with st.expander(f'📊 {selected_dataset} (first 5 rows)'):
+    # Allow user to select a dataset to view
+    selected_dataset = st.selectbox('Select a dataset to display:', list(datasets.keys()))
     st.write(datasets[selected_dataset].head(5))
 
 
