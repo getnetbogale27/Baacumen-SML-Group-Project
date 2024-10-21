@@ -618,37 +618,44 @@ with st.expander("🔄 Recursive Feature Elimination (RFE)"):
 
 
 
-# SelectKBest
+# SelectKBest expander section
 with st.expander("⭐ SelectKBest"):
     if y is not None and not X.empty:
         # Display shape of X and y
         st.write("Shape of X:", X.shape)
         st.write("Shape of y:", y.shape)
 
-        # Check for non-numeric columns
-        non_numeric_cols = X.select_dtypes(exclude=[np.number]).columns.tolist()
-        if non_numeric_cols:
-            st.write(f"Non-numeric columns detected: {non_numeric_cols}")
-
-            # Apply one-hot encoding to non-numeric columns
-            X = pd.get_dummies(X, drop_first=True)
-            st.write("After encoding, shape of X:", X.shape)
-
-        # Ensure X is numeric before using SelectKBest
-        if not X.select_dtypes(exclude=[np.number]).empty:
-            st.write("X still contains non-numeric data after encoding.")
+        # Ensure X and y have consistent sizes
+        if len(X) != len(y):
+            st.error("Error: X and y have inconsistent sample sizes.")
         else:
-            # Apply SelectKBest
-            try:
-                selector = SelectKBest(score_func=f_classif, k=10)
-                X_selected_kbest = selector.fit_transform(X, y)
-                selected_indices_kbest = selector.get_support(indices=True)
-                selected_features_kbest = X.columns[selected_indices_kbest].tolist()
-                st.write("Selected Features using SelectKBest:", selected_features_kbest)
-            except Exception as e:
-                st.write(f"Error during SelectKBest: {str(e)}")
+            # Check for non-numeric columns in X
+            non_numeric_cols = X.select_dtypes(exclude=[np.number]).columns.tolist()
+            if non_numeric_cols:
+                st.write(f"Non-numeric columns detected: {non_numeric_cols}")
+
+                # Apply one-hot encoding to non-numeric columns
+                X = pd.get_dummies(X, drop_first=True)
+                st.write("After encoding, shape of X:", X.shape)
+
+            # Ensure all columns in X are numeric
+            if not X.select_dtypes(exclude=[np.number]).empty:
+                st.error("X still contains non-numeric data after encoding.")
+            else:
+                # Apply SelectKBest with appropriate error handling
+                try:
+                    k = min(10, X.shape[1])  # Ensure k does not exceed number of features
+                    selector = SelectKBest(score_func=f_classif, k=k)
+                    X_selected_kbest = selector.fit_transform(X, y)
+
+                    # Retrieve selected feature names
+                    selected_indices_kbest = selector.get_support(indices=True)
+                    selected_features_kbest = X.columns[selected_indices_kbest].tolist()
+                    st.write("Selected Features using SelectKBest:", selected_features_kbest)
+                except ValueError as e:
+                    st.error(f"Error during SelectKBest: {str(e)}")
     else:
-        st.write("Cannot perform SelectKBest: Ensure that X and y are defined correctly.")
+        st.warning("Cannot perform SelectKBest: Ensure that X and y are defined correctly.")
         
 
 
