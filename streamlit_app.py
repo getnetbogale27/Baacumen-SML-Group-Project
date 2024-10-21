@@ -619,55 +619,38 @@ with st.expander("🔄 Recursive Feature Elimination (RFE)"):
 
 
 
-# PCA for Feature Selection
-with st.expander("📉 PCA (Principal Component Analysis)"):
-    if y is not None and not X.empty:
-        # Display shape of X and y
-        st.write("Shape of X:", X.shape)
-        st.write("Shape of y:", y.shape)
+# 1. Preprocessing: Standardizing the features
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 
-        # Identify non-numeric columns
-        non_numeric_cols = X.select_dtypes(exclude=[np.number]).columns.tolist()
-        if non_numeric_cols:
-            st.write(f"Non-numeric columns detected: {non_numeric_cols}")
+# 2. Applying PCA (choose n_components such that 95% variance is explained)
+pca = PCA(n_components=0.95)  # Retain 95% of the variance
+X_pca = pca.fit_transform(X_scaled)
 
-            # Apply one-hot encoding to non-numeric columns
-            X = pd.get_dummies(X, drop_first=True)
-            st.write("After encoding, shape of X:", X.shape)
+# Display the explained variance ratio
+with st.expander('⚙️ Explained Variance by Each Principal Component'):
+    st.write(pca.explained_variance_ratio_)
 
-        # Standardize the features before applying PCA
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(X)
-        st.write("Features standardized.")
+# 3. Show transformed data (first 5 rows)
+X_pca_df = pd.DataFrame(X_pca, columns=[f'PC{i+1}' for i in range(X_pca.shape[1])])
 
-        # Initialize PCA
-        n_components = min(10, X.shape[1])  # Limit components to 10 or less
-        pca = PCA(n_components=n_components)
+with st.expander('🧩 PCA-Transformed X (first 5 rows)'):
+    st.write(X_pca_df.head(5))
 
-        try:
-            # Fit PCA and transform X
-            X_pca = pca.fit_transform(X_scaled)
-            explained_variance = pca.explained_variance_ratio_
-            st.write(f"Explained Variance Ratio of top {n_components} components:", explained_variance)
+# 4. Train-test split using transformed features
+from sklearn.model_selection import train_test_split
 
-            # Display cumulative explained variance
-            cumulative_variance = explained_variance.cumsum()
-            st.write("Cumulative Explained Variance:", cumulative_variance)
+y = df.iloc[:, -1]  # Assuming last column is the target
+X_train, X_test, y_train, y_test = train_test_split(X_pca_df, y, test_size=0.3, random_state=42)
 
-            # Select components explaining at least 95% of variance
-            selected_components = (cumulative_variance >= 0.95).argmax() + 1
-            st.write(f"Number of components explaining 95% variance: {selected_components}")
+# 5. Display the first few rows of the training set
+with st.expander('📊 X_train (first 5 rows)'):
+    st.write(X_train.head(5))
 
-            # If needed, apply PCA with the selected number of components
-            pca_final = PCA(n_components=selected_components)
-            X_pca_final = pca_final.fit_transform(X_scaled)
-            st.write(f"After PCA, shape of X: {X_pca_final.shape}")
+with st.expander('🎯 y_train (first 5 rows)'):
+    st.write(y_train.head(5).reset_index(drop=True))
 
-        except ValueError as e:
-            st.error(f"Error during PCA: {str(e)}")
-
-    else:
-        st.warning("Cannot perform PCA: Ensure that X and y are defined correctly.")
 
 
 
