@@ -616,13 +616,41 @@ with st.expander("🔄 Recursive Feature Elimination (RFE)"):
 #     selected_features_rfe = X.columns[fit.support_].tolist()
 #     st.write("Selected Features using RFE:", selected_features_rfe)
 
-# SelectKBest
+
+
 with st.expander("⭐ SelectKBest"):
-    selector = SelectKBest(score_func=f_classif, k=10)
-    X_selected_kbest = selector.fit_transform(X, y)
-    selected_indices_kbest = selector.get_support(indices=True)
-    selected_features_kbest = X.columns[selected_indices_kbest].tolist()
-    st.write("Selected Features using SelectKBest:", selected_features_kbest)
+    # Step 1: Check for non-numeric columns
+    if not np.issubdtype(X.dtypes.values, np.number):
+        st.write("Non-numeric columns detected, applying one-hot encoding...")
+        X = pd.get_dummies(X, drop_first=True)
+
+    # Step 2: Handle any missing values
+    if X.isna().sum().any():
+        st.write("Missing values detected, replacing with 0...")
+        X = X.fillna(0)
+
+    # Step 3: Apply SelectKBest for feature selection
+    try:
+        selector = SelectKBest(score_func=f_classif, k=10)
+        X_selected_kbest = selector.fit_transform(X, y)
+
+        # Get selected feature names
+        selected_indices_kbest = selector.get_support(indices=True)
+        selected_features_kbest = X.columns[selected_indices_kbest].tolist()
+
+        # Display the selected features
+        st.write("Selected Features using SelectKBest:", selected_features_kbest)
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+
+
+# # SelectKBest
+# with st.expander("⭐ SelectKBest"):
+#     selector = SelectKBest(score_func=f_classif, k=10)
+#     X_selected_kbest = selector.fit_transform(X, y)
+#     selected_indices_kbest = selector.get_support(indices=True)
+#     selected_features_kbest = X.columns[selected_indices_kbest].tolist()
+#     st.write("Selected Features using SelectKBest:", selected_features_kbest)
 
 # Lasso Regularization
 with st.expander("🧩 Lasso Regularization"):
