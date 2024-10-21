@@ -8,7 +8,6 @@ from sklearn.linear_model import LogisticRegression, Lasso, RidgeClassifier, Ela
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import label_binarize
-from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import roc_curve, auc
@@ -580,6 +579,16 @@ with st.expander('📊 X_train (first 5 rows)'):
 with st.expander('🎯 y_train (first 5 rows)'):
     st.write(y_train.head(5).reset_index(drop=True))
 
+# Debugging: Check the shape and content of X
+print("Shape of X:", X.shape)
+print("Sample data from X:", X.head())
+print("Null values in X:", X.isnull().sum())
+
+# Try fitting the scaler
+try:
+    X_scaled = scaler.fit_transform(X)
+except Exception as e:
+    print("Error encountered during scaling:", e)
 
 
 
