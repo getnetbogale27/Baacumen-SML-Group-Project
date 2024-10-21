@@ -553,15 +553,25 @@ with st.expander("📊 Correlation Matrix"):
 
 
 
-
-
 # Recursive Feature Elimination (RFE)
 with st.expander("🔄 Recursive Feature Elimination (RFE)"):
-    model = RandomForestClassifier()
-    rfe = RFE(model, n_features_to_select=10)
-    fit = rfe.fit(X, y)
-    selected_features_rfe = X.columns[fit.support_].tolist()
-    st.write("Selected Features using RFE:", selected_features_rfe)
+    if y is not None and not X.empty:
+        model = RandomForestClassifier()
+        rfe = RFE(model, n_features_to_select=10)
+        fit = rfe.fit(X, y)
+        selected_features_rfe = X.columns[fit.support_].tolist()
+        st.write("Selected Features using RFE:", selected_features_rfe)
+    else:
+        st.write("Cannot perform RFE: Ensure that X and y are defined correctly.")
+
+
+# # Recursive Feature Elimination (RFE)
+# with st.expander("🔄 Recursive Feature Elimination (RFE)"):
+#     model = RandomForestClassifier()
+#     rfe = RFE(model, n_features_to_select=10)
+#     fit = rfe.fit(X, y)
+#     selected_features_rfe = X.columns[fit.support_].tolist()
+#     st.write("Selected Features using RFE:", selected_features_rfe)
 
 # SelectKBest
 with st.expander("⭐ SelectKBest"):
