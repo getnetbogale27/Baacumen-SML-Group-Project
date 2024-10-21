@@ -549,7 +549,7 @@ def feature_importance(X, y):
     return feature_importance_df
 
 # Get feature importance
-importance_df = feature_importance(X_raw, y_raw)
+importance_df = feature_importance(X, y)
 
 # Streamlit visualization
 with st.expander("Feature Importance using ExtraTreesRegressor"):
