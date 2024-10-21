@@ -525,6 +525,10 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 ratios = [0.1, 0.15, 0.2, 0.25, 0.3]
 datasets = {}
 
+# Create directories for saving datasets
+output_dir = 'datasets'
+os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
+
 # Loop through each ratio to split and save datasets
 for ratio in ratios:
     # Splitting the dataset
@@ -536,9 +540,12 @@ for ratio in ratios:
     test_df = pd.DataFrame(X_test)
     test_df['churn_risk_score'] = y_test.values
 
-    # Save datasets to CSV files
-    train_df.to_csv(f'train_set_{int((1-ratio)*100)}.csv', index=False)
-    test_df.to_csv(f'test_set_{int(ratio*100)}.csv', index=False)
+    # Save datasets to CSV files in the created directory
+    train_file = os.path.join(output_dir, f'train_set_{int((1-ratio)*100)}.csv')
+    test_file = os.path.join(output_dir, f'test_set_{int(ratio*100)}.csv')
+    
+    train_df.to_csv(train_file, index=False)
+    test_df.to_csv(test_file, index=False)
 
     # Store datasets in the dictionary for displaying
     datasets[f'Train set {int((1-ratio)*100)}%'] = train_df
@@ -550,7 +557,7 @@ selected_dataset = list(datasets.keys())[0]  # Default selection for training se
 # Display both training and testing datasets in one expander
 with st.expander('Dataset Previews (Train Vs Test)'):
     # Allow user to select a dataset to view
-    selected_dataset = st.selectbox('Select a training dataset here to display the test data authomatically displayed:', list(datasets.keys()))
+    selected_dataset = st.selectbox('Select a training dataset here to display the test data automatically displayed:', list(datasets.keys()))
     
     # Display the selected dataset
     st.write(f"**{selected_dataset} Preview:**")
