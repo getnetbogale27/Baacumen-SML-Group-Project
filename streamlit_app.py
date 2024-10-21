@@ -548,7 +548,6 @@ with st.expander("📊 Correlation Matrix"):
         st.write("'churn_risk_score' does not exist in the DataFrame.")
 
 
-
 # Recursive Feature Elimination (RFE)
 with st.expander("🔄 Recursive Feature Elimination (RFE)"):
     if y is not None and not X.empty:
