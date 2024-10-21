@@ -390,8 +390,8 @@ with st.expander("Data Visualizations", expanded=True):
     # Categorical Visualizations
     plot_data(df, categorical_columns, plot_type='count')
 
-    # Numerical Visualizations: Histograms
-    plot_data(df, numerical_columns, plot_type='hist')
+    # # Numerical Visualizations: Histograms
+    # plot_data(df, numerical_columns, plot_type='hist')
 
     # Numerical Visualizations: Box plots
     plot_data(df, numerical_columns, plot_type='box')
