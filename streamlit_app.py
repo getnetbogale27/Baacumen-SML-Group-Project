@@ -518,12 +518,34 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 # Data Spliting
-# Splitting the dataset into training and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+# Splitting the dataset into different training and test sets
+split_ratios = [0.1, 0.15, 0.2, 0.25, 0.3]  # Test sizes for 90:10, 85:15, 80:20, 75:25, 70:30
+datasets = {}
 
-# Display sizes of the splits
-st.write(f"Training set size: {X_train.shape[0]}, Test set size: {X_test.shape[0]}")
+for ratio in split_ratios:
+    test_size = ratio
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, stratify=y, random_state=42)
+    
+    # Save the datasets
+    datasets[f'Train ({100 - (test_size * 100)}%)'], datasets[f'Test ({test_size * 100}%)'] = (X_train, X_test, y_train, y_test)
 
+    # Display the selected dataset in the expander
+    with st.expander(f'Dataset Split {100 - (test_size * 100)}:{test_size * 100}'):
+        st.write('### Training Data (First 5 Rows):')
+        st.write(X_train.head())
+        st.write('### Test Data (First 5 Rows):')
+        st.write(X_test.head())
+
+# Optional: Save the datasets as CSV files
+for key, value in datasets.items():
+    X_train, X_test, y_train, y_test = value
+    X_train.to_csv(f'X_train_{key}.csv', index=False)
+    X_test.to_csv(f'X_test_{key}.csv', index=False)
+    y_train.to_csv(f'y_train_{key}.csv', index=False)
+    y_test.to_csv(f'y_test_{key}.csv', index=False)
+
+# Inform the user that datasets have been saved
+st.success("Datasets have been saved successfully!")
 
 
 
