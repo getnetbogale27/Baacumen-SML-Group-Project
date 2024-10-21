@@ -546,51 +546,6 @@ with st.expander("📊 Correlation Matrix"):
     else:
         st.write("'churn_risk_score' does not exist in the DataFrame.")
 
-# Debugging: Check the shape and content of X
-print("Shape of X:", X.shape)
-print("Sample data from X:", X.head())
-print("Null values in X:", X.isnull().sum())
-
-# Try fitting the scaler
-try:
-    X_scaled = scaler.fit_transform(X)
-except Exception as e:
-    print("Error encountered during scaling:", e)
-
-# 1. Preprocessing: Standardizing the features
-X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-
-# 2. Applying PCA (choose n_components such that 95% variance is explained)
-pca = PCA(n_components=0.95)  # Retain 95% of the variance
-X_pca = pca.fit_transform(X_scaled)
-
-# Display the explained variance ratio
-with st.expander('⚙️ Explained Variance by Each Principal Component'):
-    st.write(pca.explained_variance_ratio_)
-
-# 3. Show transformed data (first 5 rows)
-X_pca_df = pd.DataFrame(X_pca, columns=[f'PC{i+1}' for i in range(X_pca.shape[1])])
-
-with st.expander('🧩 PCA-Transformed X (first 5 rows)'):
-    st.write(X_pca_df.head(5))
-
-# 4. Train-test split using transformed features
-from sklearn.model_selection import train_test_split
-
-y = df.iloc[:, -1]  # Assuming last column is the target
-X_train, X_test, y_train, y_test = train_test_split(X_pca_df, y, test_size=0.3, random_state=42)
-
-# 5. Display the first few rows of the training set
-with st.expander('📊 X_train (first 5 rows)'):
-    st.write(X_train.head(5))
-
-with st.expander('🎯 y_train (first 5 rows)'):
-    st.write(y_train.head(5).reset_index(drop=True))
-
-
-
 
 
 
@@ -715,6 +670,41 @@ with st.expander("⭐ SelectKBest"):
 #     selected_indices_kbest = selector.get_support(indices=True)
 #     selected_features_kbest = X.columns[selected_indices_kbest].tolist()
 #     st.write("Selected Features using SelectKBest:", selected_features_kbest)
+
+
+# 1. Preprocessing: Standardizing the features
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# 2. Applying PCA (choose n_components such that 95% variance is explained)
+pca = PCA(n_components=0.95)  # Retain 95% of the variance
+X_pca = pca.fit_transform(X_scaled)
+
+# Display the explained variance ratio
+with st.expander('⚙️ Explained Variance by Each Principal Component'):
+    st.write(pca.explained_variance_ratio_)
+
+# 3. Show transformed data (first 5 rows)
+X_pca_df = pd.DataFrame(X_pca, columns=[f'PC{i+1}' for i in range(X_pca.shape[1])])
+
+with st.expander('🧩 PCA-Transformed X (first 5 rows)'):
+    st.write(X_pca_df.head(5))
+
+# 4. Train-test split using transformed features
+from sklearn.model_selection import train_test_split
+
+y = df.iloc[:, -1]  # Assuming last column is the target
+X_train, X_test, y_train, y_test = train_test_split(X_pca_df, y, test_size=0.3, random_state=42)
+
+# 5. Display the first few rows of the training set
+with st.expander('📊 X_train (first 5 rows)'):
+    st.write(X_train.head(5))
+
+with st.expander('🎯 y_train (first 5 rows)'):
+    st.write(y_train.head(5).reset_index(drop=True))
+
+
 
 # Lasso Regularization
 with st.expander("🧩 Lasso Regularization"):
