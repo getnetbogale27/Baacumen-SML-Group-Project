@@ -546,13 +546,10 @@ for ratio in ratios:
 # Initialize the selected dataset before displaying
 selected_dataset = list(datasets.keys())[0]  # Default selection
 
-# Create an expander for viewing split data
-with st.expander('View split data'):
+# Display the selected dataset in an expander
+with st.expander(f'📊 {selected_dataset} (first 5 rows)'):
     # Allow user to select a dataset to view
-    selected_dataset = st.selectbox('Select a dataset to display:', list(datasets.keys()), index=0)
-    
-    # Display the first 5 rows of the selected dataset
-    st.write(f'📊 {selected_dataset} (first 5 rows):')
+    selected_dataset = st.selectbox('Select a dataset to display:', list(datasets.keys()))
     st.write(datasets[selected_dataset].head(5))
 
 
