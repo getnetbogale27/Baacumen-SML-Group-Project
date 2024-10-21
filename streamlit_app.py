@@ -1,4 +1,5 @@
 # Step 1: Import necessary packages and dataset
+import os
 import streamlit as st
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
