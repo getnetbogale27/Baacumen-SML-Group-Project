@@ -415,26 +415,51 @@ with st.expander("Data Visualizations", expanded=True):
 
 
 
-# Outlier Detection and treat for newly computed features
-# Run outlier detection first
-detect_outliers_iqr(df, numerical_columns)
-detect_outliers_iqr(df, numerical_columns)
+#Outlier Detection and treat for newly computed features 
+# Function to detect and handle outliers using IQR
+def detect_outliers_iqr(df, column):
+    if column not in df.columns:
+        st.warning(f"Column '{column}' does not exist in the DataFrame.")
+        return df
+    
+    # Calculate Q1, Q3, and IQR
+    Q1 = df[column].quantile(0.25)
+    Q3 = df[column].quantile(0.75)
+    IQR = Q3 - Q1
+
+    # Define outlier boundaries
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+
+    # Filter out outliers
+    outliers = df[(df[column] < lower_bound) | (df[column] > upper_bound)]
+    st.write(f"{len(outliers)} outliers detected in '{column}'")
+
+    # Optionally: Replace outliers with NaN (or other strategy)
+    df[column] = df[column].apply(
+        lambda x: x if lower_bound <= x <= upper_bound else None
+    )
+
+    return df
+
+# Call detect_outliers_iqr for each column
+for col in numerical_columns:
+    df = detect_outliers_iqr(df, col)
 
 # Create an expander for boxplot visualization
-with st.expander("Treating Outlier for newly computed features"):
-    # Set up the matplotlib figure
+with st.expander("📊 Treating Outliers for Newly Computed Features"):
     plt.figure(figsize=(15, 10))
-    
-    # Create subplots for each numerical variable
-    num_columns = 2  # Number of columns in the subplot grid
-    num_rows = (len(numerical_columns) + num_columns - 1) // num_columns  # Calculate number of rows needed
-    
+
+    # Subplot grid setup
+    num_columns = 2
+    num_rows = (len(numerical_columns) + num_columns - 1) // num_columns
+
+    # Create boxplots for each numerical column
     for idx, column in enumerate(numerical_columns):
-        plt.subplot(num_rows, num_columns, idx + 1)  # Subplot indexing starts at 1
+        plt.subplot(num_rows, num_columns, idx + 1)
         sns.boxplot(x=df[column])
         plt.title(f'Boxplot of {column}')
 
-    # Show the plots
     plt.tight_layout()
     st.pyplot(plt)
 
