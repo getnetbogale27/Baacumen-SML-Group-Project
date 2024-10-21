@@ -25,6 +25,9 @@ from sklearn.linear_model import LassoCV
 from boruta import BorutaPy
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.metrics import accuracy_score, classification_report
 
 
 
@@ -572,6 +575,48 @@ with st.expander('Dataset Previews (Train Vs Test)'):
 
 
 
+# Step 4: Model Building 
+# Algorithm Selection
+# Step 1: Data Preparation
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn_risk_score'])  # Features
+y = df['churn_risk_score']  # Target variable
+
+# Step 2: Split the dataset
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+# Step 3: Initialize the algorithms
+models = {
+    'Decision Tree': DecisionTreeClassifier(random_state=42),
+    'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
+    'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42)
+}
+
+# Step 4: Fit models and evaluate
+results = {}
+for model_name, model in models.items():
+    # Fit the model
+    model.fit(X_train, y_train)
+    
+    # Make predictions
+    y_pred = model.predict(X_test)
+    
+    # Evaluate the model
+    accuracy = accuracy_score(y_test, y_pred)
+    classification_report_str = classification_report(y_test, y_pred, output_dict=True)
+    
+    # Store results
+    results[model_name] = {
+        'accuracy': accuracy,
+        'classification_report': classification_report_str
+    }
+
+# Display results in Streamlit
+st.title('Model Evaluation Results')
+for model_name, metrics in results.items():
+    st.subheader(f"{model_name}")
+    st.write(f"Accuracy: {metrics['accuracy']:.2f}")
+    st.write("Classification Report:")
+    st.write(metrics['classification_report'])
 
 
 
