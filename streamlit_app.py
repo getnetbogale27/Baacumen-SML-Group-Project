@@ -89,6 +89,8 @@ missing_values = {
 
 # Replace these specified values with NaN
 df.replace(missing_values, np.nan, inplace=True)
+# Replace -999 globally across the entire DataFrame
+df.replace(-999, np.nan, inplace=True)
 
 # Capture the missing data summary
 missing_data_summary = df.isnull().sum()
