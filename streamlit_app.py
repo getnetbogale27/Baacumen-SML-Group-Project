@@ -606,40 +606,51 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 #     st.write("Top 10 selected features based on Chi-Square:", list(selected_kbest_features))
 
 
-# Identify columns with non-numeric data
-non_numeric_cols = X.select_dtypes(exclude=[np.number]).columns
-st.write("Non-numeric columns:", list(non_numeric_cols))
-
-# Example: Apply Label Encoding to each non-numeric column
-for col in non_numeric_cols:
-    le = LabelEncoder()
-    X[col] = le.fit_transform(X[col])
-
-# Convert non-numeric columns to dummy variables
-X = pd.get_dummies(X, drop_first=True)
-
-X.fillna(X.mean(), inplace=True)  # Optionally fill any remaining NaN values
 
 
-# Random Forest Feature Selection
-rf = RandomForestClassifier(random_state=42)
+# Convert date columns to numeric features
+df['joining_date'] = pd.to_datetime(df['joining_date'])
+df['days_since_joining'] = (pd.Timestamp.today() - df['joining_date']).dt.days
+
+df['last_visit_time'] = pd.to_datetime(df['last_visit_time'])
+df['days_since_last_visit'] = (pd.Timestamp.today() - df['last_visit_time']).dt.days
+
+X = X.drop(columns=['joining_date', 'last_visit_time'])  # Keep only numeric versions
+
+
+# Apply Label Encoding for binary columns (e.g., Yes/No)
+binary_cols = ['joined_through_referral', 'used_special_discount', 'offer_application_preference', 'past_complaint']
+
+for col in binary_cols:
+    X[col] = LabelEncoder().fit_transform(X[col])
+
+# Apply One-Hot Encoding for multi-class categorical columns
+X = pd.get_dummies(X, columns=['gender', 'region_category', 'membership_category', 
+                               'preferred_offer_types', 'medium_of_operation', 
+                               'internet_option', 'complaint_status', 'feedback', 'tenure_category'], 
+                   drop_first=True)
+
+# Ensure all values are non-negative
+X = X.clip(lower=0)  # Replace negative values with 0
+
+
+# Perform Chi-Square feature selection
 try:
-    rf.fit(X, y)
-    selector = SelectFromModel(rf, threshold='mean', prefit=True)
-    selected_features = X.columns[selector.get_support()]
-    df_selected = X[selected_features]
-    st.write("Selected features based on Random Forest:", list(selected_features))
-except ValueError as e:
-    st.error(f"Error fitting Random Forest: {e}")
-
-# Chi-Square Feature Selection
-chi2_selector = SelectKBest(chi2, k=10)
-try:
+    chi2_selector = SelectKBest(chi2, k=10)  # Adjust 'k' as needed
     X_kbest = chi2_selector.fit_transform(X, y)
     selected_kbest_features = X.columns[chi2_selector.get_support()]
     st.write("Top 10 features based on Chi-Square:", list(selected_kbest_features))
 except ValueError as e:
     st.error(f"Error in Chi-Square Selection: {e}")
+
+
+rf = RandomForestClassifier(random_state=42)
+rf.fit(X, y)
+
+selector = SelectFromModel(rf, threshold='mean', prefit=True)
+selected_features = X.columns[selector.get_support()]
+st.write("Selected features based on Random Forest:", list(selected_features))
+
 
 
 
