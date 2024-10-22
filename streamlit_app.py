@@ -573,33 +573,21 @@ df['churn_risk_score'] = churn_risk_score  # Append it to the end
 
 # Step 2: Display raw data (first 5 rows)
 with st.expander('🔢 Raw Data (first 5 rows) including new features before splitting'):
-    st.write(df.head(5))  # Display the first 5 rows of raw data
+    st.write(df.head(5))  # Display first 5 rows of raw data
 
-# Step 3: Prepare X (Features) with numeric and categorical data
-# Drop unnecessary columns
-X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn_risk_score'])
+# Step 3: Prepare X (Features) and handle non-numeric data
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id'])  # Drop unnecessary columns
 
-# Separate numeric and categorical columns
-X_numeric = X.select_dtypes(include=['number'])
-X_categorical = X.select_dtypes(include=['object', 'category'])
-
-# Handle categorical data using One-Hot Encoding
-if not X_categorical.empty:
-    encoder = OneHotEncoder(sparse=False, drop='first')  # Drop first to avoid multicollinearity
-    X_encoded = pd.DataFrame(encoder.fit_transform(X_categorical), columns=encoder.get_feature_names_out(X_categorical.columns))
-else:
-    X_encoded = pd.DataFrame()  # No categorical data
-
-# Combine numeric and encoded categorical data
-X_combined = pd.concat([X_numeric, X_encoded], axis=1)
+# One-hot encode categorical features
+X_encoded = pd.get_dummies(X, drop_first=True)  # Use drop_first to avoid dummy variable trap
 
 # Check for missing values
-if X_combined.isnull().values.any():
+if X_encoded.isnull().values.any():
     st.error("⚠️ The dataset contains missing values. Please handle them before scaling.")
 else:
-    # Normalize the combined features
+    # Normalize the features
     scaler = MinMaxScaler()
-    X_normalized = pd.DataFrame(scaler.fit_transform(X_combined), columns=X_combined.columns)
+    X_normalized = pd.DataFrame(scaler.fit_transform(X_encoded), columns=X_encoded.columns)
 
     with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
         st.write(X_normalized.head(5))  # Display the first 5 rows of normalized features
