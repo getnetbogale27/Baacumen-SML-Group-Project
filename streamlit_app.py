@@ -565,7 +565,7 @@ chi2_scores = pd.Series(chi2_selector.scores_, index=numeric_columns.columns).so
 X_train, X_test, y_train, y_test = train_test_split(X_non_negative, y, test_size=0.2, random_state=42)
 rf = RandomForestClassifier(random_state=42)
 rf.fit(X_train, y_train)
-st.success("Random Forest model trained successfully!")
+# st.success("Random Forest model trained successfully!")
 
 # 5. Display Results in One Expander
 with st.expander("🔍 Feature Importance and Predictions"):
@@ -573,13 +573,13 @@ with st.expander("🔍 Feature Importance and Predictions"):
     st.write("Chi-Square Feature Importances (sorted):")
     st.write(chi2_scores)
 
-    # Plot Feature Importance (Chi-Square)
-    fig_chi2, ax = plt.subplots(figsize=(10, 6))
-    chi2_scores.plot(kind='barh', ax=ax, color='lightgreen')
-    ax.set_title("Chi-Square Feature Importances")
-    ax.set_xlabel("Chi-Square Score")
-    ax.invert_yaxis()  # Invert to display highest importance on top
-    st.pyplot(fig_chi2)
+    # # Plot Feature Importance (Chi-Square)
+    # fig_chi2, ax = plt.subplots(figsize=(10, 6))
+    # chi2_scores.plot(kind='barh', ax=ax, color='lightgreen')
+    # ax.set_title("Chi-Square Feature Importances")
+    # ax.set_xlabel("Chi-Square Score")
+    # ax.invert_yaxis()  # Invert to display highest importance on top
+    # st.pyplot(fig_chi2)
 
     # Plot Feature Importance (Random Forest)
     rf_feature_importance = pd.Series(rf.feature_importances_, index=numeric_columns.columns).sort_values(ascending=False)
