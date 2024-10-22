@@ -391,7 +391,7 @@ numerical_columns = [
 ]
 
 # Create a single expander for all visualizations
-with st.expander("Data Visualizations", expanded=True):
+with st.expander("Data Visualizations", expanded=False):
     # Categorical Visualizations
     plot_data(df, categorical_columns, plot_type='count')
 
