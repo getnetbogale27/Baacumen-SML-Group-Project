@@ -419,50 +419,52 @@ with st.expander("Data Visualizations"):
 
 
 
-# Create the figure for all boxplots
-fig3, axs3 = plt.subplots(3, 3, figsize=(20, 15))
+# New set of features to handle outliers
+new_features = [
+    'customer_tenure', 'login_frequency', 'avg_engagement_score', 
+    'recency', 'engagement_score', 'churn_history', 
+    'points_utilization_rate', 'offer_responsiveness'
+]
 
-# Boxplots for Average Transaction Value
-sns.boxplot(x=df_before_handling['avg_transaction_value'], ax=axs3[0, 0])
-axs3[0, 0].set_title('Boxplot of Average Transaction Value (Before Handling)')
+# Store a copy of the original data for the new features
+df_new_before_handling = df[new_features].copy()
 
-sns.boxplot(x=df['avg_transaction_value'], ax=axs3[0, 1])
-axs3[0, 1].set_title('Boxplot of Average Transaction Value (After Handling)')
+# Applying IQR method to handle outliers
+for feature in new_features:
+    Q1 = df[feature].quantile(0.25)
+    Q3 = df[feature].quantile(0.75)
+    IQR = Q3 - Q1
 
-# Boxplots for Points in Wallet
-sns.boxplot(x=df_before_handling['points_in_wallet'], ax=axs3[1, 0])
-axs3[1, 0].set_title('Boxplot of Points in Wallet (Before Handling)')
+    # Define bounds
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
 
-sns.boxplot(x=df['points_in_wallet'], ax=axs3[1, 1])
-axs3[1, 1].set_title('Boxplot of Points in Wallet (After Handling)')
+    # Handle outliers by clipping to lower and upper bounds
+    df[feature] = df[feature].clip(lower=lower_bound, upper=upper_bound)
 
-# Boxplots for new features
-# Customer Tenure
-sns.boxplot(x=df_before_handling['customer_tenure'], ax=axs3[0, 2])
-axs3[0, 2].set_title('Boxplot of Customer Tenure (Before Handling)')
+# Create boxplots for the new features before and after handling
+fig5, axs5 = plt.subplots(2, 4, figsize=(20, 10))  # Before handling
+fig6, axs6 = plt.subplots(2, 4, figsize=(20, 10))  # After handling
 
-sns.boxplot(x=df['customer_tenure'], ax=axs3[1, 2])
-axs3[1, 2].set_title('Boxplot of Customer Tenure (After Handling)')
+# Plotting boxplots for the new features
+for i, feature in enumerate(new_features):
+    row, col = divmod(i, 4)  # Determine subplot position
 
-# Login Frequency
-sns.boxplot(x=df_before_handling['login_frequency'], ax=axs3[2, 0])
-axs3[2, 0].set_title('Boxplot of Login Frequency (Before Handling)')
+    # Boxplot before handling
+    sns.boxplot(x=df_new_before_handling[feature], ax=axs5[row, col])
+    axs5[row, col].set_title(f'Boxplot of {feature.replace("_", " ").title()} (Before Handling)')
 
-sns.boxplot(x=df['login_frequency'], ax=axs3[2, 1])
-axs3[2, 1].set_title('Boxplot of Login Frequency (After Handling)')
+    # Boxplot after handling
+    sns.boxplot(x=df[feature], ax=axs6[row, col])
+    axs6[row, col].set_title(f'Boxplot of {feature.replace("_", " ").title()} (After Handling)')
 
-# Average Engagement Score
-sns.boxplot(x=df_before_handling['avg_engagement_score'], ax=axs3[2, 2])
-axs3[2, 2].set_title('Boxplot of Avg Engagement Score (Before Handling)')
-
+# Adjust layout
 plt.tight_layout()
 
-# Create a single expander for all boxplots
-with st.expander('📊 Boxplots for Outlier Visualization and Handling'):
-    st.pyplot(fig)
-    st.pyplot(fig2)
-    st.pyplot(fig3)
-
+# Streamlit: Display the new boxplots in an expander
+with st.expander('📊 Boxplots for Outlier Visualization and Handling (New Features)'):
+    st.pyplot(fig5)  # Before handling
+    st.pyplot(fig6)  # After handling
 
 
 
