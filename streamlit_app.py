@@ -578,26 +578,36 @@ with st.expander('🔢 Raw Data (first 5 rows) including new features before spl
 # Step 3: Prepare X (Features) and handle non-numeric data
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id'])  # Drop unnecessary columns
 
-# One-hot encode categorical features
-X_encoded = pd.get_dummies(X, drop_first=True)  # Use drop_first to avoid dummy variable trap
+# Identify numerical and categorical columns
+numerical_cols = X.select_dtypes(include=['number']).columns.tolist()
+categorical_cols = X.select_dtypes(exclude=['number']).columns.tolist()
 
-# Check for missing values
-if X_encoded.isnull().values.any():
-    st.error("⚠️ The dataset contains missing values. Please handle them before scaling.")
-else:
-    # Normalize the features
-    scaler = MinMaxScaler()
-    X_normalized = pd.DataFrame(scaler.fit_transform(X_encoded), columns=X_encoded.columns)
+# Create a column transformer for one-hot encoding categorical columns and normalizing numerical columns
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', MinMaxScaler(), numerical_cols),  # Normalize numerical columns
+        ('cat', OneHotEncoder(), categorical_cols)  # One-hot encode categorical columns
+    ],
+    remainder='drop'  # Drop any remaining columns not specified above
+)
 
-    with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
-        st.write(X_normalized.head(5))  # Display the first 5 rows of normalized features
+# Fit and transform the data
+X_transformed = preprocessor.fit_transform(X)
+
+# Convert the transformed features back into a DataFrame
+# Get new column names after one-hot encoding
+one_hot_columns = preprocessor.named_transformers_['cat'].get_feature_names_out(categorical_cols)
+columns = numerical_cols + list(one_hot_columns)
+X_normalized = pd.DataFrame(X_transformed, columns=columns)
+
+with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
+    st.write(X_normalized.head(5))  # Display the first 5 rows of normalized features
 
 # Step 4: Prepare Y (Target variable)
 y = df['churn_risk_score']  # Extract the target variable
 
 with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     st.write(y.head(5).reset_index(drop=True))  # Display the first 5 rows of the target variable
-
 
 
 
