@@ -539,6 +539,7 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 
+# 1. Define X (features) and y (target variable)
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn_risk_score'])
 y = df['churn_risk_score']
 
@@ -560,18 +561,20 @@ chi2_selector = SelectKBest(chi2, k=10)
 X_kbest = chi2_selector.fit_transform(X_non_negative, y)
 selected_kbest_features = numeric_columns.columns[chi2_selector.get_support()]
 
-st.write("Top 10 features based on Chi-Square:", list(selected_kbest_features))
-
 # 4. Train Random Forest
 X_train, X_test, y_train, y_test = train_test_split(X_non_negative, y, test_size=0.2, random_state=42)
 rf = RandomForestClassifier(random_state=42)
 rf.fit(X_train, y_train)
 st.success("Random Forest model trained successfully!")
 
-# 5. Plot Feature Importance (Random Forest)
-rf_feature_importance = pd.Series(rf.feature_importances_, index=numeric_columns.columns).sort_values(ascending=False)
+# 5. Display Results in One Expander
+with st.expander("🔍 Feature Selection and Importance"):
+    # Display Chi-Square Scores
+    chi2_scores = pd.Series(chi2_selector.scores_, index=numeric_columns.columns).sort_values(ascending=False)
+    st.write("Top 10 features based on Chi-Square:", list(selected_kbest_features))
 
-with st.expander("🌲 Random Forest Feature Importance Plot"):
+    # Plot Feature Importance (Random Forest)
+    rf_feature_importance = pd.Series(rf.feature_importances_, index=numeric_columns.columns).sort_values(ascending=False)
     fig_rf, ax = plt.subplots(figsize=(10, 6))
     rf_feature_importance.head(10).plot(kind='barh', ax=ax, color='skyblue')
     ax.set_title("Top 10 Random Forest Feature Importances")
@@ -579,10 +582,7 @@ with st.expander("🌲 Random Forest Feature Importance Plot"):
     ax.invert_yaxis()  # Invert to display highest importance on top
     st.pyplot(fig_rf)
 
-# 6. Plot Feature Importance (Chi-Square)
-chi2_scores = pd.Series(chi2_selector.scores_, index=numeric_columns.columns).sort_values(ascending=False)
-
-with st.expander("✳️ Chi-Square Feature Importance Plot"):
+    # Plot Feature Importance (Chi-Square)
     fig_chi2, ax = plt.subplots(figsize=(10, 6))
     chi2_scores.head(10).plot(kind='barh', ax=ax, color='lightgreen')
     ax.set_title("Top 10 Chi-Square Feature Importances")
@@ -590,9 +590,9 @@ with st.expander("✳️ Chi-Square Feature Importance Plot"):
     ax.invert_yaxis()
     st.pyplot(fig_chi2)
 
-# 7. Display Predictions (Optional)
-y_pred = rf.predict(X_test)
-with st.expander("🎯 Random Forest Predictions (first 5)"):
+    # Display Predictions (Optional)
+    y_pred = rf.predict(X_test)
+    st.write("Random Forest Predictions (first 5):")
     st.write(pd.DataFrame({'Actual': y_test.values[:5], 'Predicted': y_pred[:5]}).reset_index(drop=True))
 
 
