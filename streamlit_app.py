@@ -613,7 +613,6 @@ X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn
 y = df['churn_risk_score']
 
 # 2. Handle Categorical Data (One-Hot Encoding)
-st.subheader("3.3 Handling Categorical Data")
 categorical_columns = [
     'gender', 'region_category', 'membership_category', 'joined_through_referral',
     'preferred_offer_types', 'medium_of_operation', 'internet_option',
@@ -623,22 +622,21 @@ categorical_columns = [
 
 X_encoded = pd.get_dummies(X, columns=categorical_columns, drop_first=True)
 
-with st.expander('🧩 Encoded Features (first 5 rows)'):
-    st.write(X_encoded.head(5))
+# 3. Select Only Numeric Columns for `.clip()`
+numeric_columns = X_encoded.select_dtypes(include=[np.number])
 
-# 3. Ensure Non-Negative Values for Chi-Square
-X_non_negative = X_encoded.clip(lower=0)
+# Ensure Non-Negative Values for Chi-Square
+X_non_negative = numeric_columns.clip(lower=0)
 
 # 4. Handle Missing Values
 X_non_negative.fillna(X_non_negative.mean(), inplace=True)
 
 # 5. Feature Selection with Chi-Square
-st.subheader("3.4 Chi-Square Feature Selection")
 chi2_selector = SelectKBest(chi2, k=10)  # Select top 10 features
 
 try:
     X_kbest = chi2_selector.fit_transform(X_non_negative, y)
-    selected_kbest_features = X_encoded.columns[chi2_selector.get_support()]
+    selected_kbest_features = numeric_columns.columns[chi2_selector.get_support()]
     st.write("Top 10 features based on Chi-Square:", list(selected_kbest_features))
 except ValueError as e:
     st.error(f"Error in Chi-Square Selection: {e}")
@@ -649,7 +647,6 @@ from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X_non_negative, y, test_size=0.2, random_state=42)
 
 # 7. Train a Random Forest Model
-st.subheader("3.5 Random Forest Model Training")
 rf = RandomForestClassifier(random_state=42)
 
 try:
@@ -663,7 +660,6 @@ y_pred = rf.predict(X_test)
 
 with st.expander("🎯 Random Forest Predictions (first 5)"):
     st.write(pd.DataFrame({'Actual': y_test.values[:5], 'Predicted': y_pred[:5]}).reset_index(drop=True))
-
 
 
 
