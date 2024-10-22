@@ -540,25 +540,71 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 
+# # Feature Selection
+# # 1. Correlation-based Feature Selection
+# numerical_columns = X.select_dtypes(include=[np.number]).columns
+# corr_matrix = X[numerical_columns].corr().abs()
+# upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+# to_drop = [column for column in upper.columns if any(upper[column] > 0.85)]
+# df_reduced = X.drop(columns=to_drop)
 
-# Check for missing values
-missing_values = X.isnull().sum()
-st.write("Missing values in each feature:")
-st.write(missing_values[missing_values > 0])
+# # 2. Random Forest Feature Importance
+# rf = RandomForestClassifier(random_state=42)
+# rf.fit(X, y)
+# selector = SelectFromModel(rf, threshold='mean', prefit=True)
+# selected_features = X.columns[selector.get_support()]
+# df_selected = X[selected_features]
 
-# Example: Fill missing values with the mean (for numeric columns)
-X.fillna(X.mean(), inplace=True)
+# # 3. Chi-Square Feature Selection
+# chi2_selector = SelectKBest(chi2, k=10)
+# X_kbest = chi2_selector.fit_transform(X, y)
+# selected_kbest_features = X.columns[chi2_selector.get_support()]
+# df_kbest = X[selected_kbest_features]
 
-# Check data types
-st.write("Data types of features:")
-st.write(X.dtypes)
+# # Display selected features
+# with st.expander("📊 Selected Features after Feature Selection"):
+#     st.write("Features to drop due to high correlation:", to_drop)
+#     st.write("Selected features based on Random Forest:", list(selected_features))
+#     st.write("Top 10 selected features based on Chi-Square:", list(selected_kbest_features))
 
-# Convert categorical columns to numeric if needed
-# Example: Convert using One-Hot Encoding if any categorical columns remain
-X = pd.get_dummies(X, drop_first=True)
 
-st.write("Shape of X:", X.shape)
-st.write("Shape of y:", y.shape)
+
+
+
+# Feature Selection
+# 1. Correlation-based Feature Selection
+numerical_columns = X.select_dtypes(include=[np.number]).columns
+corr_matrix = X[numerical_columns].corr().abs()
+upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+to_drop = [column for column in upper.columns if any(upper[column] > 0.85)]
+df_reduced = X.drop(columns=to_drop)
+
+# 2. Random Forest Feature Importance
+rf = RandomForestClassifier(random_state=42)
+
+try:
+    rf.fit(X, y)
+    selector = SelectFromModel(rf, threshold='mean', prefit=True)
+    selected_features = X.columns[selector.get_support()]
+    df_selected = X[selected_features]
+except ValueError as e:
+    st.error(f"Error fitting Random Forest: {e}")
+
+# 3. Chi-Square Feature Selection
+chi2_selector = SelectKBest(chi2, k=10)
+try:
+    X_kbest = chi2_selector.fit_transform(X, y)
+    selected_kbest_features = X.columns[chi2_selector.get_support()]
+    df_kbest = X[selected_kbest_features]
+except ValueError as e:
+    st.error(f"Error in Chi-Square Selection: {e}")
+
+# Display selected features
+with st.expander("📊 Selected Features after Feature Selection"):
+    st.write("Features to drop due to high correlation:", to_drop)
+    st.write("Selected features based on Random Forest:", list(selected_features))
+    st.write("Top 10 selected features based on Chi-Square:", list(selected_kbest_features))
+
 
 
 
