@@ -569,14 +569,14 @@ st.success("Random Forest model trained successfully!")
 
 # 5. Display Results in One Expander
 with st.expander("🔍 Feature Importance and Predictions"):
-    # Display the top 10 features based on Chi-Square
-    st.write("Top 10 features based on Chi-Square:", list(selected_kbest_features))
+    # Display the top features based on Chi-Square
+    st.write("Features selected based on Chi-Square:", list(selected_kbest_features))
 
-    # Plot Feature Importance (Random Forest)
+    # Plot Feature Importance (Random Forest) for all variables
     rf_feature_importance = pd.Series(rf.feature_importances_, index=numeric_columns.columns).sort_values(ascending=False)
-    fig_rf, ax = plt.subplots(figsize=(10, 6))
-    rf_feature_importance.head(10).plot(kind='barh', ax=ax, color='skyblue')
-    ax.set_title("Top 10 Random Forest Feature Importances")
+    fig_rf, ax = plt.subplots(figsize=(10, 12))  # Increased height for better visibility
+    rf_feature_importance.plot(kind='barh', ax=ax, color='skyblue')
+    ax.set_title("Random Forest Feature Importances")
     ax.set_xlabel("Importance Score")
     ax.invert_yaxis()  # Invert to display highest importance on top
     st.pyplot(fig_rf)
