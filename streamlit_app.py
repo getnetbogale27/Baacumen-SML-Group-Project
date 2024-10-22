@@ -559,24 +559,29 @@ numerical_columns = [
     'offer_responsiveness'
 ]
 
-# Combine both categorical and numerical columns
+# 3. Encode categorical features
 X_encoded = pd.get_dummies(X, columns=categorical_columns, drop_first=True)
-X_encoded = X_encoded[numerical_columns + list(X_encoded.columns.difference(numerical_columns))]  # Ensure numerical columns are preserved
-X_non_negative = X_encoded.clip(lower=0)
+
+# Ensure numerical columns are preserved
+X_encoded = X_encoded[numerical_columns + [col for col in X_encoded.columns if col not in numerical_columns]]
+
+# 4. Clip non-negative and fill missing values only for numeric columns
+numeric_columns = X_encoded.select_dtypes(include=[np.number]).columns
+X_non_negative = X_encoded[numeric_columns].clip(lower=0)
 X_non_negative.fillna(X_non_negative.mean(), inplace=True)
 
-# 3. Feature Selection with Chi-Square for all features
+# 5. Feature Selection with Chi-Square for all features
 chi2_selector = SelectKBest(chi2, k='all')  # Use 'all' to consider all features
 X_kbest = chi2_selector.fit_transform(X_non_negative, y)
 chi2_scores = pd.Series(chi2_selector.scores_, index=X_encoded.columns).sort_values(ascending=False)
 
-# 4. Train Random Forest
+# 6. Train Random Forest
 X_train, X_test, y_train, y_test = train_test_split(X_non_negative, y, test_size=0.2, random_state=42)
 rf = RandomForestClassifier(random_state=42)
 rf.fit(X_train, y_train)
 st.success("Random Forest model trained successfully!")
 
-# 5. Display Results in One Expander
+# 7. Display Results in One Expander
 with st.expander("🔍 Feature Importance and Predictions"):
     # Display Chi-Square Scores for all features
     st.write("Chi-Square Feature Importances (sorted):")
@@ -603,7 +608,6 @@ with st.expander("🔍 Feature Importance and Predictions"):
     y_pred = rf.predict(X_test)
     st.write("Random Forest Predictions (first 5):")
     st.write(pd.DataFrame({'Actual': y_test.values[:5], 'Predicted': y_pred[:5]}).reset_index(drop=True))
-
 
 
 
