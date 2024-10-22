@@ -539,80 +539,10 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 
-
-# # Feature Selection
-# # 1. Correlation-based Feature Selection
-# numerical_columns = X.select_dtypes(include=[np.number]).columns
-# corr_matrix = X[numerical_columns].corr().abs()
-# upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-# to_drop = [column for column in upper.columns if any(upper[column] > 0.85)]
-# df_reduced = X.drop(columns=to_drop)
-
-# # 2. Random Forest Feature Importance
-# rf = RandomForestClassifier(random_state=42)
-# rf.fit(X, y)
-# selector = SelectFromModel(rf, threshold='mean', prefit=True)
-# selected_features = X.columns[selector.get_support()]
-# df_selected = X[selected_features]
-
-# # 3. Chi-Square Feature Selection
-# chi2_selector = SelectKBest(chi2, k=10)
-# X_kbest = chi2_selector.fit_transform(X, y)
-# selected_kbest_features = X.columns[chi2_selector.get_support()]
-# df_kbest = X[selected_kbest_features]
-
-# # Display selected features
-# with st.expander("📊 Selected Features after Feature Selection"):
-#     st.write("Features to drop due to high correlation:", to_drop)
-#     st.write("Selected features based on Random Forest:", list(selected_features))
-#     st.write("Top 10 selected features based on Chi-Square:", list(selected_kbest_features))
-
-
-
-
-
-# Feature Selection
-# 1. Correlation-based Feature Selection
-# numerical_columns = X.select_dtypes(include=[np.number]).columns
-# corr_matrix = X[numerical_columns].corr().abs()
-# upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-# to_drop = [column for column in upper.columns if any(upper[column] > 0.85)]
-# df_reduced = X.drop(columns=to_drop)
-
-# # 2. Random Forest Feature Importance
-# rf = RandomForestClassifier(random_state=42)
-
-# try:
-#     rf.fit(X, y)
-#     selector = SelectFromModel(rf, threshold='mean', prefit=True)
-#     selected_features = X.columns[selector.get_support()]
-#     df_selected = X[selected_features]
-# except ValueError as e:
-#     st.error(f"Error fitting Random Forest: {e}")
-
-# # 3. Chi-Square Feature Selection
-# chi2_selector = SelectKBest(chi2, k=10)
-# try:
-#     X_kbest = chi2_selector.fit_transform(X, y)
-#     selected_kbest_features = X.columns[chi2_selector.get_support()]
-#     df_kbest = X[selected_kbest_features]
-# except ValueError as e:
-#     st.error(f"Error in Chi-Square Selection: {e}")
-
-# # Display selected features
-# with st.expander("📊 Selected Features after Feature Selection"):
-#     st.write("Features to drop due to high correlation:", to_drop)
-#     st.write("Selected features based on Random Forest:", list(selected_features))
-#     st.write("Top 10 selected features based on Chi-Square:", list(selected_kbest_features))
-
-
-
-
-# 1. Define X (features) and y (target variable)
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn_risk_score'])
 y = df['churn_risk_score']
 
-# 2. Handle Categorical Data (One-Hot Encoding)
+# 2. Handle Categorical Data
 categorical_columns = [
     'gender', 'region_category', 'membership_category', 'joined_through_referral',
     'preferred_offer_types', 'medium_of_operation', 'internet_option',
@@ -621,46 +551,49 @@ categorical_columns = [
 ]
 
 X_encoded = pd.get_dummies(X, columns=categorical_columns, drop_first=True)
-
-# 3. Select Only Numeric Columns for `.clip()`
 numeric_columns = X_encoded.select_dtypes(include=[np.number])
-
-# Ensure Non-Negative Values for Chi-Square
 X_non_negative = numeric_columns.clip(lower=0)
-
-# 4. Handle Missing Values
 X_non_negative.fillna(X_non_negative.mean(), inplace=True)
 
-# 5. Feature Selection with Chi-Square
-chi2_selector = SelectKBest(chi2, k=10)  # Select top 10 features
+# 3. Feature Selection with Chi-Square
+chi2_selector = SelectKBest(chi2, k=10)
+X_kbest = chi2_selector.fit_transform(X_non_negative, y)
+selected_kbest_features = numeric_columns.columns[chi2_selector.get_support()]
 
-try:
-    X_kbest = chi2_selector.fit_transform(X_non_negative, y)
-    selected_kbest_features = numeric_columns.columns[chi2_selector.get_support()]
-    st.write("Top 10 features based on Chi-Square:", list(selected_kbest_features))
-except ValueError as e:
-    st.error(f"Error in Chi-Square Selection: {e}")
+st.write("Top 10 features based on Chi-Square:", list(selected_kbest_features))
 
-# 6. Split the Data into Train and Test Sets
-from sklearn.model_selection import train_test_split
-
+# 4. Train Random Forest
 X_train, X_test, y_train, y_test = train_test_split(X_non_negative, y, test_size=0.2, random_state=42)
-
-# 7. Train a Random Forest Model
 rf = RandomForestClassifier(random_state=42)
+rf.fit(X_train, y_train)
+st.success("Random Forest model trained successfully!")
 
-try:
-    rf.fit(X_train, y_train)
-    st.success("Random Forest model trained successfully!")
-except ValueError as e:
-    st.error(f"Error fitting Random Forest: {e}")
+# 5. Plot Feature Importance (Random Forest)
+rf_feature_importance = pd.Series(rf.feature_importances_, index=numeric_columns.columns).sort_values(ascending=False)
 
-# 8. Display Predictions (Optional)
+with st.expander("🌲 Random Forest Feature Importance Plot"):
+    fig_rf, ax = plt.subplots(figsize=(10, 6))
+    rf_feature_importance.head(10).plot(kind='barh', ax=ax, color='skyblue')
+    ax.set_title("Top 10 Random Forest Feature Importances")
+    ax.set_xlabel("Importance Score")
+    ax.invert_yaxis()  # Invert to display highest importance on top
+    st.pyplot(fig_rf)
+
+# 6. Plot Feature Importance (Chi-Square)
+chi2_scores = pd.Series(chi2_selector.scores_, index=numeric_columns.columns).sort_values(ascending=False)
+
+with st.expander("✳️ Chi-Square Feature Importance Plot"):
+    fig_chi2, ax = plt.subplots(figsize=(10, 6))
+    chi2_scores.head(10).plot(kind='barh', ax=ax, color='lightgreen')
+    ax.set_title("Top 10 Chi-Square Feature Importances")
+    ax.set_xlabel("Chi-Square Score")
+    ax.invert_yaxis()
+    st.pyplot(fig_chi2)
+
+# 7. Display Predictions (Optional)
 y_pred = rf.predict(X_test)
-
 with st.expander("🎯 Random Forest Predictions (first 5)"):
     st.write(pd.DataFrame({'Actual': y_test.values[:5], 'Predicted': y_pred[:5]}).reset_index(drop=True))
-
 
 
 
