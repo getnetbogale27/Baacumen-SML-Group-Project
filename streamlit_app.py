@@ -538,31 +538,6 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     st.write(y.head(5).reset_index(drop=True))
 
 
-# Ensure all categorical data in X is encoded
-X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]
-
-# Convert categorical columns to numerical using pd.get_dummies()
-X = pd.get_dummies(X)
-
-# Check and fill any missing values in X
-X.fillna(X.mean(), inplace=True)
-
-# Encode the target variable y if it's not already numeric
-y = df.iloc[:, -1]
-
-if y.dtype == 'object':
-    le = LabelEncoder()
-    y = le.fit_transform(y)
-
-# Fit the RandomForestClassifier after preprocessing
-rf = RandomForestClassifier(random_state=42)
-
-try:
-    rf.fit(X, y)
-    st.write("Model fitted successfully!")
-except ValueError as e:
-    st.error(f"Error fitting the model: {e}")
-
 
 # # Feature Selection
 # # 1. Correlation-based Feature Selection
@@ -590,6 +565,28 @@ except ValueError as e:
 #     st.write("Features to drop due to high correlation:", to_drop)
 #     st.write("Selected features based on Random Forest:", list(selected_features))
 #     st.write("Top 10 selected features based on Chi-Square:", list(selected_kbest_features))
+
+
+
+
+# Check for missing values
+missing_values = X.isnull().sum()
+st.write("Missing values in each feature:")
+st.write(missing_values[missing_values > 0])
+
+# Example: Fill missing values with the mean (for numeric columns)
+X.fillna(X.mean(), inplace=True)
+
+# Check data types
+st.write("Data types of features:")
+st.write(X.dtypes)
+
+# Convert categorical columns to numeric if needed
+# Example: Convert using One-Hot Encoding if any categorical columns remain
+X = pd.get_dummies(X, drop_first=True)
+
+st.write("Shape of X:", X.shape)
+st.write("Shape of y:", y.shape)
 
 
 
