@@ -577,13 +577,13 @@ df['churn_risk_score'] = churn_risk_score  # Append it to the end
 with st.expander('🔢 Raw data (first 5 rows) including newly computed features before splitting'):
     st.write(df.head(5))  # Display first 5 rows of raw data
 
-# Step 3: Prepare X (Features) and convert categorical variables to numeric using One-Hot Encoding
+# Step 3: Prepare X (Features) and convert categorical variables to numeric using one-hot encoding
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
 
-# Apply One-Hot Encoding to categorical columns
+# One-hot encode categorical columns
 X = pd.get_dummies(X, drop_first=True)
 
-# Step 4: Normalize the features
+# Step 4: Normalize all features
 scaler = MinMaxScaler()
 X_normalized = pd.DataFrame(scaler.fit_transform(X), columns=X.columns)
 
