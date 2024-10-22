@@ -625,7 +625,9 @@ with st.expander('🔢 Raw data (first 5 rows) including newly computed features
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
 
 # Step 4: One-Hot Encode Categorical Columns
-X_encoded = pd.get_dummies(X, drop_first=True)  # Convert categorical to one-hot encoding
+X_encoded = pd.get_dummies(X, drop_first=True)  # One-hot encode categorical variables
+
+# The output of pd.get_dummies() is already in 0s and 1s
 
 # Step 5: Normalize Numeric Features
 X_numeric = X_encoded.select_dtypes(include=['number'])  # Select only numeric columns for normalization
@@ -635,6 +637,8 @@ if X_numeric.isnull().values.any():
     st.error("The dataset contains missing values. Please handle them before scaling.")
 else:
     # Normalize the numeric features
+    from sklearn.preprocessing import MinMaxScaler
+
     scaler = MinMaxScaler()
     X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
 
