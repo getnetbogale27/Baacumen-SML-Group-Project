@@ -551,37 +551,23 @@ categorical_columns = [
     'complaint_status', 'feedback', 'tenure_category'
 ]
 
-# Include numerical columns
-numerical_columns = [
-    'age', 'days_since_last_login', 'avg_time_spent', 'avg_transaction_value',
-    'points_in_wallet', 'customer_tenure', 'login_frequency', 'avg_engagement_score',
-    'recency', 'engagement_score', 'points_utilization_rate', 'churn_history',
-    'offer_responsiveness'
-]
-
-# 3. Encode categorical features
 X_encoded = pd.get_dummies(X, columns=categorical_columns, drop_first=True)
-
-# Ensure numerical columns are preserved
-X_encoded = X_encoded[numerical_columns + [col for col in X_encoded.columns if col not in numerical_columns]]
-
-# 4. Clip non-negative and fill missing values only for numeric columns
-numeric_columns = X_encoded.select_dtypes(include=[np.number]).columns
-X_non_negative = X_encoded[numeric_columns].clip(lower=0)
+numeric_columns = X_encoded.select_dtypes(include=[np.number])
+X_non_negative = numeric_columns.clip(lower=0)
 X_non_negative.fillna(X_non_negative.mean(), inplace=True)
 
-# 5. Feature Selection with Chi-Square for all features
+# 3. Feature Selection with Chi-Square for all features
 chi2_selector = SelectKBest(chi2, k='all')  # Use 'all' to consider all features
 X_kbest = chi2_selector.fit_transform(X_non_negative, y)
-chi2_scores = pd.Series(chi2_selector.scores_, index=X_encoded.columns).sort_values(ascending=False)
+chi2_scores = pd.Series(chi2_selector.scores_, index=numeric_columns.columns).sort_values(ascending=False)
 
-# 6. Train Random Forest
+# 4. Train Random Forest
 X_train, X_test, y_train, y_test = train_test_split(X_non_negative, y, test_size=0.2, random_state=42)
 rf = RandomForestClassifier(random_state=42)
 rf.fit(X_train, y_train)
 st.success("Random Forest model trained successfully!")
 
-# 7. Display Results in One Expander
+# 5. Display Results in One Expander
 with st.expander("🔍 Feature Importance and Predictions"):
     # Display Chi-Square Scores for all features
     st.write("Chi-Square Feature Importances (sorted):")
@@ -596,7 +582,7 @@ with st.expander("🔍 Feature Importance and Predictions"):
     st.pyplot(fig_chi2)
 
     # Plot Feature Importance (Random Forest)
-    rf_feature_importance = pd.Series(rf.feature_importances_, index=X_encoded.columns).sort_values(ascending=False)
+    rf_feature_importance = pd.Series(rf.feature_importances_, index=numeric_columns.columns).sort_values(ascending=False)
     fig_rf, ax = plt.subplots(figsize=(10, 6))
     rf_feature_importance.plot(kind='barh', ax=ax, color='skyblue')
     ax.set_title("Random Forest Feature Importances")
@@ -608,6 +594,7 @@ with st.expander("🔍 Feature Importance and Predictions"):
     y_pred = rf.predict(X_test)
     st.write("Random Forest Predictions (first 5):")
     st.write(pd.DataFrame({'Actual': y_test.values[:5], 'Predicted': y_pred[:5]}).reset_index(drop=True))
+
 
 
 
