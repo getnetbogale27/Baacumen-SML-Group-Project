@@ -414,12 +414,7 @@ with st.expander("Data Visualizations"):
 
 
 
-
-
-
-
-
-# New set of features to visualize and handle
+# Treating Outlier and handling outlier for newly computed feature
 new_features = [
     'customer_tenure', 'login_frequency', 'avg_engagement_score', 
     'recency', 'engagement_score', 'churn_history', 
@@ -468,25 +463,8 @@ with st.expander('📊 Side-by-Side Boxplots for Outlier Visualization and Handl
 
 
 
-
-
 # Automatically detect numerical columns
 numerical_columns = df.select_dtypes(include=['number']).columns.tolist()
-
-# # Create an expander for the correlation heatmap
-# with st.expander("Show Correlation Heatmap"):
-#     # Set up the matplotlib figure
-#     plt.figure(figsize=(12, 8))
-    
-#     # Calculate the correlation matrix
-#     correlation_matrix = df[numerical_columns].corr()
-    
-#     # Create the heatmap
-#     sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm', square=True)
-#     plt.title('Correlation Heatmap')
-    
-#     # Show the plot in Streamlit
-#     st.pyplot(plt)
 
 with st.expander("Show Correlation Heatmap"):
     filtered_numerical_columns = [col for col in numerical_columns if col != 'is_active']
@@ -536,6 +514,29 @@ with st.expander("Show Segmentation Analysis"):
 
 st.header("Step 3: Feature Selection and Data Splitting")
 st.subheader("3.1 Feature Selection")
+# Select numerical columns for correlation analysis
+numerical_columns = df.select_dtypes(include=[np.number]).columns
+
+# Compute the correlation matrix
+corr_matrix = data_one_hot_encoded[numerical_columns].corr().abs()
+
+# Select upper triangle of the correlation matrix
+upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+
+# Identify columns with correlation > 0.85 (you can adjust the threshold)
+to_drop = [column for column in upper.columns if any(upper[column] > 0.85)]
+
+st.write(f'Features to drop due to high correlation: {to_drop}')
+
+# Drop highly correlated features
+df_reduced = data_one_hot_encoded.drop(columns=to_drop)
+
+with st.expander("🔍 Correlation Heatmap"):
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(corr_matrix, cmap='coolwarm', annot=True, fmt='.2f', linewidths=0.5)
+    st.pyplot(plt)
+
+
 
 
 st.subheader("3.2 Data Splitting")
