@@ -419,36 +419,79 @@ with st.expander("Data Visualizations"):
 
 
 
-# Initialize figure and axes for new set of boxplots (2 rows x 4 columns)
+# Combine boxplots for additional features
 fig3, axs3 = plt.subplots(2, 4, figsize=(20, 10))
 
-# Define the feature names
-features = [
-    'customer_tenure', 'login_frequency', 'avg_engagement_score', 
-    'recency', 'engagement_score', 'churn_history', 
-    'points_utilization_rate', 'offer_responsiveness'
-]
+# Boxplots for customer_tenure
+sns.boxplot(x=df_before_handling['customer_tenure'], ax=axs3[0, 0])
+axs3[0, 0].set_title('Boxplot of Customer Tenure (Before Handling)')
 
-# Iterate through features and create boxplots for 'before' and 'after' handling
-for i, feature in enumerate(features):
-    row, col = divmod(i, 4)  # Determine subplot position
-    sns.boxplot(x=df_before_handling[feature], ax=axs3[row, col])
-    axs3[row, col].set_title(f'Boxplot of {feature.replace("_", " ").title()} (Before Handling)')
+sns.boxplot(x=df['customer_tenure'], ax=axs3[0, 1])
+axs3[0, 1].set_title('Boxplot of Customer Tenure (After Handling)')
 
-fig4, axs4 = plt.subplots(2, 4, figsize=(20, 10))  # After handling
+# Boxplots for login_frequency
+sns.boxplot(x=df_before_handling['login_frequency'], ax=axs3[0, 2])
+axs3[0, 2].set_title('Boxplot of Login Frequency (Before Handling)')
 
-for i, feature in enumerate(features):
-    row, col = divmod(i, 4)  # Determine subplot position
-    sns.boxplot(x=df[feature], ax=axs4[row, col])
-    axs4[row, col].set_title(f'Boxplot of {feature.replace("_", " ").title()} (After Handling)')
+sns.boxplot(x=df['login_frequency'], ax=axs3[0, 3])
+axs3[0, 3].set_title('Boxplot of Login Frequency (After Handling)')
 
-# Layout adjustment
+# Boxplots for avg_engagement_score
+sns.boxplot(x=df_before_handling['avg_engagement_score'], ax=axs3[1, 0])
+axs3[1, 0].set_title('Boxplot of Avg Engagement Score (Before Handling)')
+
+sns.boxplot(x=df['avg_engagement_score'], ax=axs3[1, 1])
+axs3[1, 1].set_title('Boxplot of Avg Engagement Score (After Handling)')
+
+# Boxplots for recency
+sns.boxplot(x=df_before_handling['recency'], ax=axs3[1, 2])
+axs3[1, 2].set_title('Boxplot of Recency (Before Handling)')
+
+sns.boxplot(x=df['recency'], ax=axs3[1, 3])
+axs3[1, 3].set_title('Boxplot of Recency (After Handling)')
+
 plt.tight_layout()
 
-# Streamlit visualization with expanders
-with st.expander('📊 Boxplots for Outlier Visualization and Handling'):
-    st.pyplot(fig3)  # Boxplots before handling
-    st.pyplot(fig4)  # Boxplots after handling
+# Create a single expander for all boxplots
+with st.expander('📊 Boxplots for Additional Features Visualization'):
+    st.pyplot(fig3)
+
+# Now, create separate boxplots for the remaining features
+fig4, axs4 = plt.subplots(2, 4, figsize=(20, 10))
+
+# Boxplots for engagement_score
+sns.boxplot(x=df_before_handling['engagement_score'], ax=axs4[0, 0])
+axs4[0, 0].set_title('Boxplot of Engagement Score (Before Handling)')
+
+sns.boxplot(x=df['engagement_score'], ax=axs4[0, 1])
+axs4[0, 1].set_title('Boxplot of Engagement Score (After Handling)')
+
+# Boxplots for churn_history
+sns.boxplot(x=df_before_handling['churn_history'], ax=axs4[0, 2])
+axs4[0, 2].set_title('Boxplot of Churn History (Before Handling)')
+
+sns.boxplot(x=df['churn_history'], ax=axs4[0, 3])
+axs4[0, 3].set_title('Boxplot of Churn History (After Handling)')
+
+# Boxplots for points_utilization_rate
+sns.boxplot(x=df_before_handling['points_utilization_rate'], ax=axs4[1, 0])
+axs4[1, 0].set_title('Boxplot of Points Utilization Rate (Before Handling)')
+
+sns.boxplot(x=df['points_utilization_rate'], ax=axs4[1, 1])
+axs4[1, 1].set_title('Boxplot of Points Utilization Rate (After Handling)')
+
+# Boxplots for offer_responsiveness
+sns.boxplot(x=df_before_handling['offer_responsiveness'], ax=axs4[1, 2])
+axs4[1, 2].set_title('Boxplot of Offer Responsiveness (Before Handling)')
+
+sns.boxplot(x=df['offer_responsiveness'], ax=axs4[1, 3])
+axs4[1, 3].set_title('Boxplot of Offer Responsiveness (After Handling)')
+
+plt.tight_layout()
+
+# Create a single expander for all boxplots
+with st.expander('📊 Boxplots for Engagement and Responsiveness Visualization'):
+    st.pyplot(fig4)
 
 
 
