@@ -415,28 +415,7 @@ with st.expander("Data Visualizations"):
 
 
 
-#Outlier Detection and treat for newly computed features 
-# Function to detect and handle outliers using IQR
-# detect_outliers_iqr(df, numerical_columns)
-# detect_outliers_iqr(df, numerical_columns)
 
-# # Create an expander for boxplot visualization
-# with st.expander("Treating Outlier for newly computed features"):
-#     # Set up the matplotlib figure
-#     plt.figure(figsize=(15, 10))
-    
-#     # Create subplots for each numerical variable
-#     num_columns = 2  # Number of columns in the subplot grid
-#     num_rows = (len(numerical_columns) + num_columns - 1) // num_columns
-    
-#     for idx, column in enumerate(numerical_columns):
-#         plt.subplot(num_rows, num_columns, idx + 1)
-#         sns.boxplot(x=df[column])
-#         plt.title(f'Boxplot of {column}')
-
-#     # Show the plots
-#     plt.tight_layout()
-#     st.pyplot(plt)
 
 
 
