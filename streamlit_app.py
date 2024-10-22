@@ -532,6 +532,39 @@ st.subheader("3.1 Feature Selection")
 #     st.write(y.head(5).reset_index(drop=True))
 
 
+# # Step 1: Rearrange the churn_risk_score column
+# churn_risk_score = df.pop('churn_risk_score')  # Remove the column
+# df['churn_risk_score'] = churn_risk_score  # Append it to the end
+
+# # Step 2: Display raw data
+# with st.expander('🔢 Raw data (first 5 rows) including newly computed features before splitting'):
+#     st.write(df.head(5))  # Display first 5 rows of raw data
+
+# # Step 3: Prepare X (Features) and handle non-numeric data
+# X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
+
+# # Ensure only numeric columns are used
+# X_numeric = X.select_dtypes(include=['number'])
+
+# # Check for missing values
+# if X_numeric.isnull().values.any():
+#     st.error("The dataset contains missing values. Please handle them before scaling.")
+# else:
+#     # Normalize the numeric features
+#     scaler = MinMaxScaler()
+#     X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
+
+#     with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
+#         st.write(X_normalized.head(5))  # Display first 5 rows of normalized features
+
+# # Step 4: Prepare Y (Target variable)
+# y = df.iloc[:, -1]  # Extract the target variable
+
+# with st.expander('🎯 Y (Target variable) (first 5 rows)'):
+#     st.write(y.head(5).reset_index(drop=True))  # Display the first 5 rows of the target variable
+
+
+
 # Step 1: Rearrange the churn_risk_score column
 churn_risk_score = df.pop('churn_risk_score')  # Remove the column
 df['churn_risk_score'] = churn_risk_score  # Append it to the end
@@ -540,28 +573,53 @@ df['churn_risk_score'] = churn_risk_score  # Append it to the end
 with st.expander('🔢 Raw data (first 5 rows) including newly computed features before splitting'):
     st.write(df.head(5))  # Display first 5 rows of raw data
 
-# Step 3: Prepare X (Features) and handle non-numeric data
-X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
+# Step 3: Define numerical and categorical columns
+categorical_columns = [
+    'gender', 'region_category', 'membership_category', 
+    'preferred_offer_types', 'tenure_category', 'joined_through_referral', 
+    'used_special_discount', 'offer_application_preference', 
+    'past_complaint', 'complaint_status', 'churn_risk_score'
+]
 
-# Ensure only numeric columns are used
-X_numeric = X.select_dtypes(include=['number'])
+numerical_columns = [
+    'age', 'avg_time_spent', 'avg_transaction_value', 
+    'points_in_wallet', 'customer_tenure', 'login_frequency', 
+    'avg_engagement_score', 'recency', 'engagement_score', 
+    'churn_history', 'points_utilization_rate', 'offer_responsiveness'
+]
 
-# Check for missing values
-if X_numeric.isnull().values.any():
+# Step 4: Separate categorical and numerical features
+X_numeric = df[numerical_columns]
+X_categorical = df[categorical_columns]
+
+# Step 5: Encode categorical features using OneHotEncoder
+encoder = OneHotEncoder(sparse=False, drop='first')  # Drop first category to avoid multicollinearity
+X_encoded = pd.DataFrame(encoder.fit_transform(X_categorical), 
+                         columns=encoder.get_feature_names_out(categorical_columns))
+
+# Step 6: Combine numeric and encoded categorical features
+X_combined = pd.concat([X_numeric.reset_index(drop=True), 
+                        X_encoded.reset_index(drop=True)], axis=1)
+
+# Step 7: Check for missing values
+if X_combined.isnull().values.any():
     st.error("The dataset contains missing values. Please handle them before scaling.")
 else:
-    # Normalize the numeric features
+    # Step 8: Normalize the combined features
     scaler = MinMaxScaler()
-    X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
+    X_normalized = pd.DataFrame(scaler.fit_transform(X_combined), 
+                                columns=X_combined.columns)
 
+    # Step 9: Display normalized features
     with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
         st.write(X_normalized.head(5))  # Display first 5 rows of normalized features
 
-# Step 4: Prepare Y (Target variable)
+# Step 10: Prepare Y (Target variable)
 y = df.iloc[:, -1]  # Extract the target variable
 
 with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     st.write(y.head(5).reset_index(drop=True))  # Display the first 5 rows of the target variable
+
 
 
 
