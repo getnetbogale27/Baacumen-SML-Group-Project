@@ -639,7 +639,7 @@ if missing_values.any():
     # Option 1: Fill missing values (imputation)
     # You can fill with the mean, median, or any other strategy
     # For example, filling with the mean:
-    X[numerical_cols] = X[numerical_cols].fillna(X[numerical_cols].mean())
+    X[numerical_cols] = X[numerical_cols].fillna(X[numerical_cols].median())
 
     # Option 2: Alternatively, drop rows with missing values
     # X = X.dropna()
@@ -665,6 +665,7 @@ y = df.iloc[:, -1]  # Extract the target variable
 
 with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     st.write(y.head(5).reset_index(drop=True))  # Display the first 5 rows of the target variable
+
 
 
 
