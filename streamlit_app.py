@@ -137,12 +137,16 @@ df['joining_date'] = pd.to_datetime(df['joining_date'], errors='coerce')
 df['last_visit_time'] = pd.to_datetime(df['last_visit_time'], errors='coerce')
 df['churn_risk_score'] = df['churn_risk_score'].astype('category')
 
-# Step 2: Capture data types after correction
+# Step 2: Convert 'avg_frequency_login_days' from object to numeric
+df['avg_frequency_login_days'] = pd.to_numeric(df['avg_frequency_login_days'], errors='coerce')
+
+# Step 3: Capture data types after correction
 data_types_after_correction = df.dtypes
 
 # Expander: Display data types after correction
 with st.expander('🛠️ Data Types After Correction'):
     st.write(data_types_after_correction)
+
 
 
 st.subheader("1.3 Encoding Categorical Variables")
