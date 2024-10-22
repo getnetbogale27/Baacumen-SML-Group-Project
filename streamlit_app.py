@@ -515,21 +515,9 @@ with st.expander("Show Segmentation Analysis"):
 
 st.header("Step 3: Feature Selection and Data Splitting")
 st.subheader("3.1 Feature Selection")
-# Prepare input features and target variable
-X = data_one_hot_encoded.drop('churn_status', axis=1)  # Replace with your target column
-y = data_one_hot_encoded['churn_status']
 
-# Apply Chi-Square feature selection
-chi2_selector = SelectKBest(chi2, k=10)  # Select top 10 features
-X_kbest = chi2_selector.fit_transform(X, y)
 
-# Get selected feature names
-selected_kbest_features = X.columns[chi2_selector.get_support()]
 
-st.write(f'Top 10 selected features based on Chi-Square: {list(selected_kbest_features)}')
-
-# Create DataFrame with selected features
-df_kbest = X[selected_kbest_features]
 
 
 
