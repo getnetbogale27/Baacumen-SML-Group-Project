@@ -516,13 +516,6 @@ with st.expander("Show Segmentation Analysis"):
 st.header("Step 3: Feature Selection and Data Splitting")
 st.subheader("3.1 Feature Selection")
 
-
-
-
-
-
-
-st.subheader("3.2 Data Splitting")
 churn_risk_score = df.pop('churn_risk_score')  # Remove the column
 df['churn_risk_score'] = churn_risk_score  # Append it to the end
 
@@ -573,14 +566,6 @@ with st.expander("🔍 Feature Importance and Predictions"):
     st.write("Chi-Square Feature Importances (sorted):")
     st.write(chi2_scores)
 
-    # # Plot Feature Importance (Chi-Square)
-    # fig_chi2, ax = plt.subplots(figsize=(10, 6))
-    # chi2_scores.plot(kind='barh', ax=ax, color='lightgreen')
-    # ax.set_title("Chi-Square Feature Importances")
-    # ax.set_xlabel("Chi-Square Score")
-    # ax.invert_yaxis()  # Invert to display highest importance on top
-    # st.pyplot(fig_chi2)
-
     # Plot Feature Importance (Random Forest)
     rf_feature_importance = pd.Series(rf.feature_importances_, index=numeric_columns.columns).sort_values(ascending=False)
     fig_rf, ax = plt.subplots(figsize=(10, 6))
@@ -598,13 +583,7 @@ with st.expander("🔍 Feature Importance and Predictions"):
 
 
 
-
-
-
-
-
-
-# Data Splitting
+st.subheader("3.2 Data Splitting")
 # Define split ratios
 ratios = [0.1, 0.15, 0.2, 0.25, 0.3]
 datasets = {}
