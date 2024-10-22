@@ -699,7 +699,7 @@ X_final = pd.concat([X_normalized, X_encoded], axis=1)
 
 
 with st.expander ('X'):
-    st.write(X.head(5).reset_index(drop=True))
+    st.write(X_final.head(5).reset_index(drop=True))
 y = df['churn_risk_score']
 with st.expander ('y'):
     st.write(y.head(5).reset_index(drop=True))
@@ -724,7 +724,7 @@ X_kbest = chi2_selector.fit_transform(X_non_negative, y)
 chi2_scores = pd.Series(chi2_selector.scores_, index=numeric_columns.columns).sort_values(ascending=False)
 
 # 4. Train Random Forest
-X_train, X_test, y_train, y_test = train_test_split(X_non_negative, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=0.2, random_state=42)
 rf = RandomForestClassifier(random_state=42)
 rf.fit(X_train, y_train)
 # st.success("Random Forest model trained successfully!")
