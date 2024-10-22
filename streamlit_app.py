@@ -672,79 +672,52 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 # 1. Define X (features) and y (target variable)
 # X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn_risk_score'])
-X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
+# Step 1: Drop unnecessary columns
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id'])
 
 # Identify categorical and numerical columns
 categorical_cols = X.select_dtypes(include=['object']).columns.tolist()
 numerical_cols = X.select_dtypes(include=['number']).columns.tolist()
 
-# Step 4: Check for missing values
-missing_values = X[numerical_cols].isnull().sum()
-if missing_values.any():
-    # st.warning(f"The following columns have missing values:\n{missing_values[missing_values > 0]}")
-    X[numerical_cols] = X[numerical_cols].fillna(X[numerical_cols].median())
+# Handle missing values
+X[numerical_cols] = X[numerical_cols].fillna(X[numerical_cols].median())
 
-# Step 5: One-Hot Encode Categorical Columns (excluding numerical columns)
-X_encoded = pd.get_dummies(X[categorical_cols], drop_first=True)  # One-hot encode categorical variables
+# One-hot encode categorical columns
+X_encoded = pd.get_dummies(X[categorical_cols], drop_first=True)
 
-# Step 6: Normalize Numeric Features
-X_numeric = X[numerical_cols]  # Select numeric columns for normalization
-
-# Normalize the numeric features
+# Normalize numeric columns
 scaler = MinMaxScaler()
-X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
+X_normalized = pd.DataFrame(scaler.fit_transform(X[numerical_cols]), columns=numerical_cols)
 
-# Combine normalized features with one-hot encoded columns
+# Combine encoded and normalized features
 X_final = pd.concat([X_normalized, X_encoded], axis=1)
 
-
-with st.expander ('X'):
+# Display in Streamlit
+with st.expander('X'):
     st.write(X_final.head(5).reset_index(drop=True))
 y = df['churn_risk_score']
-with st.expander ('y'):
+with st.expander('y'):
     st.write(y.head(5).reset_index(drop=True))
 
-
-# 2. Handle Categorical Data
-categorical_columns = [
-    'gender', 'region_category', 'membership_category', 'joined_through_referral',
-    'preferred_offer_types', 'medium_of_operation', 'internet_option',
-    'used_special_discount', 'offer_application_preference', 'past_complaint',
-    'complaint_status', 'feedback', 'tenure_category'
-]
-
-X_encoded = pd.get_dummies(X, columns=categorical_columns, drop_first=True)
-numeric_columns = X_encoded.select_dtypes(include=[np.number])
-X_non_negative = numeric_columns.clip(lower=0)
-X_non_negative.fillna(X_non_negative.mean(), inplace=True)
-
-# 3. Feature Selection with Chi-Square for all features
-chi2_selector = SelectKBest(chi2, k='all')  # Use 'all' to consider all features
-X_kbest = chi2_selector.fit_transform(X_non_negative, y)
-chi2_scores = pd.Series(chi2_selector.scores_, index=numeric_columns.columns).sort_values(ascending=False)
-
-# 4. Train Random Forest
+# Train/test split
 X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=0.2, random_state=42)
+
+# Train Random Forest model
 rf = RandomForestClassifier(random_state=42)
 rf.fit(X_train, y_train)
-# st.success("Random Forest model trained successfully!")
 
-# 5. Display Results in One Expander
+# Display results
 with st.expander("🔍 Feature Importance and Predictions"):
-    # Display Chi-Square Scores for all features
-    st.write("Chi-Square Feature Importances (sorted):")
-    st.write(chi2_scores)
-
-    # Plot Feature Importance (Random Forest)
-    rf_feature_importance = pd.Series(rf.feature_importances_, index=numeric_columns.columns).sort_values(ascending=False)
+    # Plot feature importance
+    rf_feature_importance = pd.Series(rf.feature_importances_, index=X_final.columns).sort_values(ascending=False)
     fig_rf, ax = plt.subplots(figsize=(10, 6))
     rf_feature_importance.plot(kind='barh', ax=ax, color='skyblue')
     ax.set_title("Random Forest Feature Importances")
     ax.set_xlabel("Importance Score")
-    ax.invert_yaxis()  # Invert to display highest importance on top
+    ax.invert_yaxis()
     st.pyplot(fig_rf)
 
-    # Display Predictions (Optional)
+    # Display predictions
     y_pred = rf.predict(X_test)
     st.write("Random Forest Predictions (first 5):")
     st.write(pd.DataFrame({'Actual': y_test.values[:5], 'Predicted': y_pred[:5]}).reset_index(drop=True))
