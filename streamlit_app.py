@@ -580,10 +580,13 @@ with st.expander('🔢 Raw data (first 5 rows) including newly computed features
 # Step 3: Prepare X (Features)
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
 
-# Step 4: One-Hot Encode Categorical Columns
+# Step 4: Ensure `avg_frequency_login_days` is numeric
+X['avg_frequency_login_days'] = pd.to_numeric(X['avg_frequency_login_days'], errors='coerce')
+
+# Step 5: One-Hot Encode Categorical Columns
 X_encoded = pd.get_dummies(X, drop_first=True)  # Drop the first category to avoid dummy variable trap
 
-# Step 5: Normalize Numeric Features
+# Step 6: Normalize Numeric Features
 X_numeric = X_encoded.select_dtypes(include=['number'])  # Select only numeric columns for normalization
 
 # Check for missing values in the numeric columns
@@ -600,7 +603,7 @@ else:
     with st.expander('🧩 X (Features) (first 5 rows) - Normalized and One-Hot Encoded'):
         st.write(X_final.head(5))  # Display first 5 rows of final features
 
-# Step 6: Prepare Y (Target variable)
+# Step 7: Prepare Y (Target variable)
 y = df.iloc[:, -1]  # Extract the target variable
 
 with st.expander('🎯 Y (Target variable) (first 5 rows)'):
