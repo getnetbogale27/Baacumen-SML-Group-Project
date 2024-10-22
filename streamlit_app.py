@@ -538,6 +538,31 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     st.write(y.head(5).reset_index(drop=True))
 
 
+# Ensure all categorical data in X is encoded
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]
+
+# Convert categorical columns to numerical using pd.get_dummies()
+X = pd.get_dummies(X)
+
+# Check and fill any missing values in X
+X.fillna(X.mean(), inplace=True)
+
+# Encode the target variable y if it's not already numeric
+y = df.iloc[:, -1]
+
+if y.dtype == 'object':
+    le = LabelEncoder()
+    y = le.fit_transform(y)
+
+# Fit the RandomForestClassifier after preprocessing
+rf = RandomForestClassifier(random_state=42)
+
+try:
+    rf.fit(X, y)
+    st.write("Model fitted successfully!")
+except ValueError as e:
+    st.error(f"Error fitting the model: {e}")
+
 
 # Feature Selection
 # 1. Correlation-based Feature Selection
