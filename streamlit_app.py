@@ -573,24 +573,20 @@ st.subheader("3.1 Feature Selection")
 churn_risk_score = df.pop('churn_risk_score')  # Remove the column
 df['churn_risk_score'] = churn_risk_score  # Append it to the end
 
-# Step 2: Convert categorical columns to numeric
-categorical_cols = df.select_dtypes(include=['object', 'category']).columns
-for col in categorical_cols:
-    if df[col].nunique() <= 10:  # If few unique values, use LabelEncoder
-        encoder = LabelEncoder()
-        df[col] = encoder.fit_transform(df[col])
-    else:  # For more unique values, consider One-Hot Encoding (optional)
-        df = pd.get_dummies(df, columns=[col])
-
-# Step 3: Display raw data
+# Step 2: Display raw data
 with st.expander('🔢 Raw data (first 5 rows) including newly computed features before splitting'):
     st.write(df.head(5))  # Display first 5 rows of raw data
 
-# Step 4: Prepare X (Features) and ensure only numeric data is used
+# Step 3: Prepare X (Features)
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
-X_numeric = X.select_dtypes(include=['number'])  # Ensure only numeric columns
 
-# Check for missing values before scaling
+# Step 4: One-Hot Encode Categorical Columns
+X_encoded = pd.get_dummies(X, drop_first=True)  # Drop the first category to avoid dummy variable trap
+
+# Step 5: Normalize Numeric Features
+X_numeric = X_encoded.select_dtypes(include=['number'])  # Select only numeric columns for normalization
+
+# Check for missing values in the numeric columns
 if X_numeric.isnull().values.any():
     st.error("The dataset contains missing values. Please handle them before scaling.")
 else:
@@ -598,10 +594,13 @@ else:
     scaler = MinMaxScaler()
     X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
 
-    with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
-        st.write(X_normalized.head(5))  # Display the first 5 rows of normalized features
+    # Combine normalized features with one-hot encoded columns
+    X_final = pd.concat([X_normalized, X_encoded.drop(columns=X_numeric.columns)], axis=1)
 
-# Step 5: Prepare Y (Target variable)
+    with st.expander('🧩 X (Features) (first 5 rows) - Normalized and One-Hot Encoded'):
+        st.write(X_final.head(5))  # Display first 5 rows of final features
+
+# Step 6: Prepare Y (Target variable)
 y = df.iloc[:, -1]  # Extract the target variable
 
 with st.expander('🎯 Y (Target variable) (first 5 rows)'):
