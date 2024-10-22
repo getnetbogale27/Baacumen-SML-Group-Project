@@ -29,7 +29,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.feature_selection import SelectKBest, chi2
-
+from sklearn.feature_selection import SelectFromModel, SelectKBest, chi2
 
 
 @st.cache_data
