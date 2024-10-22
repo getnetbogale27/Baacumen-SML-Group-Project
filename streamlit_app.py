@@ -608,49 +608,61 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 
-# Convert date columns to numeric features
-df['joining_date'] = pd.to_datetime(df['joining_date'])
-df['days_since_joining'] = (pd.Timestamp.today() - df['joining_date']).dt.days
+# 1. Define X (features) and y (target variable)
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn_risk_score'])
+y = df['churn_risk_score']
 
-df['last_visit_time'] = pd.to_datetime(df['last_visit_time'])
-df['days_since_last_visit'] = (pd.Timestamp.today() - df['last_visit_time']).dt.days
+# 2. Handle Categorical Data (One-Hot Encoding)
+st.subheader("3.3 Handling Categorical Data")
+categorical_columns = [
+    'gender', 'region_category', 'membership_category', 'joined_through_referral',
+    'preferred_offer_types', 'medium_of_operation', 'internet_option',
+    'used_special_discount', 'offer_application_preference', 'past_complaint',
+    'complaint_status', 'feedback', 'tenure_category'
+]
 
-X = X.drop(columns=['joining_date', 'last_visit_time'])  # Keep only numeric versions
+X_encoded = pd.get_dummies(X, columns=categorical_columns, drop_first=True)
 
+with st.expander('🧩 Encoded Features (first 5 rows)'):
+    st.write(X_encoded.head(5))
 
-# Apply Label Encoding for binary columns (e.g., Yes/No)
-binary_cols = ['joined_through_referral', 'used_special_discount', 'offer_application_preference', 'past_complaint']
+# 3. Ensure Non-Negative Values for Chi-Square
+X_non_negative = X_encoded.clip(lower=0)
 
-for col in binary_cols:
-    X[col] = LabelEncoder().fit_transform(X[col])
+# 4. Handle Missing Values
+X_non_negative.fillna(X_non_negative.mean(), inplace=True)
 
-# Apply One-Hot Encoding for multi-class categorical columns
-X = pd.get_dummies(X, columns=['gender', 'region_category', 'membership_category', 
-                               'preferred_offer_types', 'medium_of_operation', 
-                               'internet_option', 'complaint_status', 'feedback', 'tenure_category'], 
-                   drop_first=True)
+# 5. Feature Selection with Chi-Square
+st.subheader("3.4 Chi-Square Feature Selection")
+chi2_selector = SelectKBest(chi2, k=10)  # Select top 10 features
 
-# Ensure all values are non-negative
-X = X.clip(lower=0)  # Replace negative values with 0
-
-
-# Perform Chi-Square feature selection
 try:
-    chi2_selector = SelectKBest(chi2, k=10)  # Adjust 'k' as needed
-    X_kbest = chi2_selector.fit_transform(X, y)
-    selected_kbest_features = X.columns[chi2_selector.get_support()]
+    X_kbest = chi2_selector.fit_transform(X_non_negative, y)
+    selected_kbest_features = X_encoded.columns[chi2_selector.get_support()]
     st.write("Top 10 features based on Chi-Square:", list(selected_kbest_features))
 except ValueError as e:
     st.error(f"Error in Chi-Square Selection: {e}")
 
+# 6. Split the Data into Train and Test Sets
+from sklearn.model_selection import train_test_split
 
+X_train, X_test, y_train, y_test = train_test_split(X_non_negative, y, test_size=0.2, random_state=42)
+
+# 7. Train a Random Forest Model
+st.subheader("3.5 Random Forest Model Training")
 rf = RandomForestClassifier(random_state=42)
-rf.fit(X, y)
 
-selector = SelectFromModel(rf, threshold='mean', prefit=True)
-selected_features = X.columns[selector.get_support()]
-st.write("Selected features based on Random Forest:", list(selected_features))
+try:
+    rf.fit(X_train, y_train)
+    st.success("Random Forest model trained successfully!")
+except ValueError as e:
+    st.error(f"Error fitting Random Forest: {e}")
 
+# 8. Display Predictions (Optional)
+y_pred = rf.predict(X_test)
+
+with st.expander("🎯 Random Forest Predictions (first 5)"):
+    st.write(pd.DataFrame({'Actual': y_test.values[:5], 'Predicted': y_pred[:5]}).reset_index(drop=True))
 
 
 
