@@ -28,6 +28,7 @@ from sklearn.decomposition import PCA
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.metrics import accuracy_score, classification_report
+from sklearn.feature_selection import SelectKBest, chi2
 
 
 
@@ -514,18 +515,21 @@ with st.expander("Show Segmentation Analysis"):
 
 st.header("Step 3: Feature Selection and Data Splitting")
 st.subheader("3.1 Feature Selection")
-# Fit a Random Forest model to estimate feature importance
-rf = RandomForestClassifier(random_state=42)
-rf.fit(X, y)
+# Prepare input features and target variable
+X = data_one_hot_encoded.drop('churn_status', axis=1)  # Replace with your target column
+y = data_one_hot_encoded['churn_status']
 
-# Select features with importance above the mean
-selector = SelectFromModel(rf, threshold='mean', prefit=True)
-selected_features = X.columns[(selector.get_support())]
+# Apply Chi-Square feature selection
+chi2_selector = SelectKBest(chi2, k=10)  # Select top 10 features
+X_kbest = chi2_selector.fit_transform(X, y)
 
-st.write(f'Selected features based on Random Forest: {list(selected_features)}')
+# Get selected feature names
+selected_kbest_features = X.columns[chi2_selector.get_support()]
 
-# Create a DataFrame with only the selected features
-df_selected = X[selected_features]
+st.write(f'Top 10 selected features based on Chi-Square: {list(selected_kbest_features)}')
+
+# Create DataFrame with selected features
+df_kbest = X[selected_kbest_features]
 
 
 
