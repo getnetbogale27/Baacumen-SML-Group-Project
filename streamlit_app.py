@@ -539,6 +539,36 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 
+# Feature Selection
+# 1. Correlation-based Feature Selection
+numerical_columns = X.select_dtypes(include=[np.number]).columns
+corr_matrix = X[numerical_columns].corr().abs()
+upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+to_drop = [column for column in upper.columns if any(upper[column] > 0.85)]
+df_reduced = X.drop(columns=to_drop)
+
+# 2. Random Forest Feature Importance
+rf = RandomForestClassifier(random_state=42)
+rf.fit(X, y)
+selector = SelectFromModel(rf, threshold='mean', prefit=True)
+selected_features = X.columns[selector.get_support()]
+df_selected = X[selected_features]
+
+# 3. Chi-Square Feature Selection
+chi2_selector = SelectKBest(chi2, k=10)
+X_kbest = chi2_selector.fit_transform(X, y)
+selected_kbest_features = X.columns[chi2_selector.get_support()]
+df_kbest = X[selected_kbest_features]
+
+# Display selected features
+with st.expander("📊 Selected Features after Feature Selection"):
+    st.write("Features to drop due to high correlation:", to_drop)
+    st.write("Selected features based on Random Forest:", list(selected_features))
+    st.write("Top 10 selected features based on Chi-Square:", list(selected_kbest_features))
+
+
+
+
 
 
 # Data Splitting
