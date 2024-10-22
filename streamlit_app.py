@@ -567,47 +567,43 @@ st.subheader("3.1 Feature Selection")
 
 
 
-# Step 1: Rearrange the 'churn_risk_score' column
+
+
+# Step 1: Rearrange the churn_risk_score column
 churn_risk_score = df.pop('churn_risk_score')  # Remove the column
 df['churn_risk_score'] = churn_risk_score  # Append it to the end
 
-# Step 2: Display raw data (first 5 rows)
-with st.expander('🔢 Raw Data (first 5 rows) including new features before splitting'):
+# Step 2: Display raw data
+with st.expander('🔢 Raw data (first 5 rows) including newly computed features before splitting'):
     st.write(df.head(5))  # Display first 5 rows of raw data
 
 # Step 3: Prepare X (Features) and handle non-numeric data
-X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id'])  # Drop unnecessary columns
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
 
-# Identify numerical and categorical columns
-numerical_cols = X.select_dtypes(include=['number']).columns.tolist()
-categorical_cols = X.select_dtypes(exclude=['number']).columns.tolist()
+# Step 3a: One-hot encode categorical features
+X = pd.get_dummies(X, drop_first=True)
 
-# Create a column transformer for one-hot encoding categorical columns and normalizing numerical columns
-preprocessor = ColumnTransformer(
-    transformers=[
-        ('num', MinMaxScaler(), numerical_cols),  # Normalize numerical columns
-        ('cat', OneHotEncoder(), categorical_cols)  # One-hot encode categorical columns
-    ],
-    remainder='drop'  # Drop any remaining columns not specified above
-)
+# Step 3b: Ensure only numeric columns are used
+X_numeric = X.select_dtypes(include=['number'])
 
-# Fit and transform the data
-X_transformed = preprocessor.fit_transform(X)
+# Check for missing values
+if X_numeric.isnull().values.any():
+    st.error("The dataset contains missing values. Please handle them before scaling.")
+else:
+    # Normalize the numeric features
+    scaler = MinMaxScaler()
+    X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
 
-# Convert the transformed features back into a DataFrame
-# Get new column names after one-hot encoding
-one_hot_columns = preprocessor.named_transformers_['cat'].get_feature_names_out(categorical_cols)
-columns = numerical_cols + list(one_hot_columns)
-X_normalized = pd.DataFrame(X_transformed, columns=columns)
-
-with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
-    st.write(X_normalized.head(5))  # Display the first 5 rows of normalized features
+    with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
+        st.write(X_normalized.head(5))  # Display first 5 rows of normalized features
 
 # Step 4: Prepare Y (Target variable)
-y = df['churn_risk_score']  # Extract the target variable
+y = df.iloc[:, -1]  # Extract the target variable
 
 with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     st.write(y.head(5).reset_index(drop=True))  # Display the first 5 rows of the target variable
+
+
 
 
 
