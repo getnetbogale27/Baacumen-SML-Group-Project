@@ -673,7 +673,6 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 # 1. Define X (features) and y (target variable)
 # X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn_risk_score'])
 # Step 1: Drop unnecessary columns
-# Step 1: Drop unnecessary columns
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id'])
 
 # Identify categorical and numerical columns
@@ -703,16 +702,11 @@ with st.expander('y'):
     st.write(y.head(5).reset_index(drop=True))
 
 # Step 2: Apply Chi-Square Feature Selection
-chi2_selector = SelectKBest(chi2, k='all')  # Use 'all' to retain all features
+chi2_selector = SelectKBest(chi2, k='all')
 X_kbest = chi2_selector.fit_transform(X_final, y)
 
 # Get Chi-Square scores for each feature
 chi2_scores = pd.Series(chi2_selector.scores_, index=X_final.columns).sort_values(ascending=False)
-
-# Display Chi-Square scores
-with st.expander("Chi-Square Feature Importances"):
-    st.write("Chi-Square Feature Scores (sorted):")
-    st.write(chi2_scores)
 
 # Step 3: Train/Test Split with X_kbest
 X_train, X_test, y_train, y_test = train_test_split(X_kbest, y, test_size=0.2, random_state=42)
@@ -721,18 +715,25 @@ X_train, X_test, y_train, y_test = train_test_split(X_kbest, y, test_size=0.2, r
 rf = RandomForestClassifier(random_state=42)
 rf.fit(X_train, y_train)
 
-# Step 5: Display Feature Importances and Predictions
+# Step 5: Display Chi-Square Scores, Feature Importances, and Predictions in One Expander
 with st.expander("🔍 Feature Importance and Predictions"):
+    # Display Chi-Square Feature Scores
+    st.write("Chi-Square Feature Scores (sorted):")
+    st.write(chi2_scores)
+
     # Display Random Forest Feature Importances
     rf_feature_importance = pd.Series(rf.feature_importances_, index=X_final.columns).sort_values(ascending=False)
-    fig_rf, ax = plt.subplots(figsize=(10, 6))
+    st.write("Random Forest Feature Importances (sorted):")
+    
+    # Plotting Random Forest Feature Importances
+    fig_rf, ax = plt.subplots(figsize=(10, 12))
     rf_feature_importance.plot(kind='barh', ax=ax, color='skyblue')
     ax.set_title("Random Forest Feature Importances")
     ax.set_xlabel("Importance Score")
     ax.invert_yaxis()  # Highest importance on top
     st.pyplot(fig_rf)
 
-    # Display Predictions
+    # Display Predictions (first 5 rows)
     y_pred = rf.predict(X_test)
     st.write("Random Forest Predictions (first 5):")
     st.write(pd.DataFrame({'Actual': y_test.values[:5], 'Predicted': y_pred[:5]}).reset_index(drop=True))
