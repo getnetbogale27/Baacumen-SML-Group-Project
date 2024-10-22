@@ -519,54 +519,19 @@ with st.expander("Show Segmentation Analysis"):
 st.header("Step 3: Feature Selection and Data Splitting")
 st.subheader("3.1 Feature Selection")
 
-# churn_risk_score = df.pop('churn_risk_score')  # Remove the column
-# df['churn_risk_score'] = churn_risk_score  # Append it to the end
+churn_risk_score = df.pop('churn_risk_score')  # Remove the column
+df['churn_risk_score'] = churn_risk_score  # Append it to the end
 
-# with st.expander('🔢 Raw data (first 5 rows) including newly computed features before spliting to train and test set'):
-#     st.write(df.head(5))  # Display first 5 rows of raw data
+with st.expander('🔢 Raw data (first 5 rows) including newly computed features before spliting to train and test set'):
+    st.write(df.head(5))  # Display first 5 rows of raw data
 
-# with st.expander('🧩 X (Features) (first 5 rows)'):
-#     X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
-#     st.write(X.head(5)) 
+with st.expander('🧩 X (Features) (first 5 rows)'):
+    X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
+    st.write(X.head(5)) 
 
-# with st.expander('🎯 Y (Target variable) (first 5 rows)'):
-#     y = df.iloc[:, -1]  
-#     st.write(y.head(5).reset_index(drop=True))
-
-
-# # Step 1: Rearrange the churn_risk_score column
-# churn_risk_score = df.pop('churn_risk_score')  # Remove the column
-# df['churn_risk_score'] = churn_risk_score  # Append it to the end
-
-# # Step 2: Display raw data
-# with st.expander('🔢 Raw data (first 5 rows) including newly computed features before splitting'):
-#     st.write(df.head(5))  # Display first 5 rows of raw data
-
-# # Step 3: Prepare X (Features) and handle non-numeric data
-# X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
-
-# # Ensure only numeric columns are used
-# X_numeric = X.select_dtypes(include=['number'])
-
-# # Check for missing values
-# if X_numeric.isnull().values.any():
-#     st.error("The dataset contains missing values. Please handle them before scaling.")
-# else:
-#     # Normalize the numeric features
-#     scaler = MinMaxScaler()
-#     X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
-
-#     with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
-#         st.write(X_normalized.head(5))  # Display first 5 rows of normalized features
-
-# # Step 4: Prepare Y (Target variable)
-# y = df.iloc[:, -1]  # Extract the target variable
-
-# with st.expander('🎯 Y (Target variable) (first 5 rows)'):
-#     st.write(y.head(5).reset_index(drop=True))  # Display the first 5 rows of the target variable
-
-
-
+with st.expander('🎯 Y (Target variable) (first 5 rows)'):
+    y = df.iloc[:, -1]  
+    st.write(y.head(5).reset_index(drop=True))
 
 
 # Step 1: Rearrange the churn_risk_score column
@@ -577,24 +542,33 @@ df['churn_risk_score'] = churn_risk_score  # Append it to the end
 with st.expander('🔢 Raw data (first 5 rows) including newly computed features before splitting'):
     st.write(df.head(5))  # Display first 5 rows of raw data
 
-# Step 3: Prepare X (Features) and convert categorical variables to numeric using one-hot encoding
+# Step 3: Prepare X (Features) and handle non-numeric data
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
 
-# One-hot encode categorical columns
-X = pd.get_dummies(X, drop_first=True)
+# Ensure only numeric columns are used
+X_numeric = X.select_dtypes(include=['number'])
 
-# Step 4: Normalize all features
-scaler = MinMaxScaler()
-X_normalized = pd.DataFrame(scaler.fit_transform(X), columns=X.columns)
+# Check for missing values
+if X_numeric.isnull().values.any():
+    st.error("The dataset contains missing values. Please handle them before scaling.")
+else:
+    # Normalize the numeric features
+    scaler = MinMaxScaler()
+    X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
 
-with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
-    st.write(X_normalized.head(5))  # Display first 5 rows of normalized features
+    with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
+        st.write(X_normalized.head(5))  # Display first 5 rows of normalized features
 
-# Step 5: Prepare Y (Target variable)
+# Step 4: Prepare Y (Target variable)
 y = df.iloc[:, -1]  # Extract the target variable
 
 with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     st.write(y.head(5).reset_index(drop=True))  # Display the first 5 rows of the target variable
+
+
+
+
+
 
 
 
