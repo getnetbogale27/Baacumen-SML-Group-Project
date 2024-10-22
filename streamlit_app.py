@@ -516,19 +516,44 @@ with st.expander("Show Segmentation Analysis"):
 st.header("Step 3: Feature Selection and Data Splitting")
 st.subheader("3.1 Feature Selection")
 
+# churn_risk_score = df.pop('churn_risk_score')  # Remove the column
+# df['churn_risk_score'] = churn_risk_score  # Append it to the end
+
+# with st.expander('🔢 Raw data (first 5 rows) including newly computed features before spliting to train and test set'):
+#     st.write(df.head(5))  # Display first 5 rows of raw data
+
+# with st.expander('🧩 X (Features) (first 5 rows)'):
+#     X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
+#     st.write(X.head(5)) 
+
+# with st.expander('🎯 Y (Target variable) (first 5 rows)'):
+#     y = df.iloc[:, -1]  
+#     st.write(y.head(5).reset_index(drop=True))
+
+
+# Step 1: Rearrange the churn_risk_score column
 churn_risk_score = df.pop('churn_risk_score')  # Remove the column
 df['churn_risk_score'] = churn_risk_score  # Append it to the end
 
-with st.expander('🔢 Raw data (first 5 rows) including newly computed features before spliting to train and test set'):
+# Step 2: Show the raw data
+with st.expander('🔢 Raw data (first 5 rows) including newly computed features before splitting to train and test set'):
     st.write(df.head(5))  # Display first 5 rows of raw data
 
-with st.expander('🧩 X (Features) (first 5 rows)'):
-    X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
-    st.write(X.head(5)) 
+# Step 3: Prepare X (Features) and normalize them
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
+scaler = MinMaxScaler()  # Initialize the scaler
+X_normalized = pd.DataFrame(scaler.fit_transform(X), columns=X.columns)  # Normalize and create a DataFrame
+
+with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
+    st.write(X_normalized.head(5))  # Display the first 5 rows of normalized features
+
+# Step 4: Prepare Y (Target variable)
+y = df.iloc[:, -1]  # Extract the target variable
 
 with st.expander('🎯 Y (Target variable) (first 5 rows)'):
-    y = df.iloc[:, -1]  
-    st.write(y.head(5).reset_index(drop=True))
+    st.write(y.head(5).reset_index(drop=True))  # Display the first 5 rows of target variable
+
+
 
 
 
