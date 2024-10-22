@@ -573,52 +573,35 @@ st.subheader("3.1 Feature Selection")
 churn_risk_score = df.pop('churn_risk_score')  # Remove the column
 df['churn_risk_score'] = churn_risk_score  # Append it to the end
 
-# Step 2: Display raw data
+# Step 2: Convert categorical columns to numeric
+categorical_cols = df.select_dtypes(include=['object', 'category']).columns
+for col in categorical_cols:
+    if df[col].nunique() <= 10:  # If few unique values, use LabelEncoder
+        encoder = LabelEncoder()
+        df[col] = encoder.fit_transform(df[col])
+    else:  # For more unique values, consider One-Hot Encoding (optional)
+        df = pd.get_dummies(df, columns=[col])
+
+# Step 3: Display raw data
 with st.expander('🔢 Raw data (first 5 rows) including newly computed features before splitting'):
     st.write(df.head(5))  # Display first 5 rows of raw data
 
-# Step 3: Define numerical and categorical columns
-categorical_columns = [
-    'gender', 'region_category', 'membership_category', 
-    'preferred_offer_types', 'tenure_category', 'joined_through_referral', 
-    'used_special_discount', 'offer_application_preference', 
-    'past_complaint', 'complaint_status', 'churn_risk_score'
-]
+# Step 4: Prepare X (Features) and ensure only numeric data is used
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
+X_numeric = X.select_dtypes(include=['number'])  # Ensure only numeric columns
 
-numerical_columns = [
-    'age', 'avg_time_spent', 'avg_transaction_value', 
-    'points_in_wallet', 'customer_tenure', 'login_frequency', 
-    'avg_engagement_score', 'recency', 'engagement_score', 
-    'churn_history', 'points_utilization_rate', 'offer_responsiveness'
-]
-
-# Step 4: Separate categorical and numerical features
-X_numeric = df[numerical_columns]
-X_categorical = df[categorical_columns]
-
-# Step 5: Encode categorical features using OneHotEncoder
-encoder = OneHotEncoder(sparse=False, drop='first')  # Drop first category to avoid multicollinearity
-X_encoded = pd.DataFrame(encoder.fit_transform(X_categorical), 
-                         columns=encoder.get_feature_names_out(categorical_columns))
-
-# Step 6: Combine numeric and encoded categorical features
-X_combined = pd.concat([X_numeric.reset_index(drop=True), 
-                        X_encoded.reset_index(drop=True)], axis=1)
-
-# Step 7: Check for missing values
-if X_combined.isnull().values.any():
+# Check for missing values before scaling
+if X_numeric.isnull().values.any():
     st.error("The dataset contains missing values. Please handle them before scaling.")
 else:
-    # Step 8: Normalize the combined features
+    # Normalize the numeric features
     scaler = MinMaxScaler()
-    X_normalized = pd.DataFrame(scaler.fit_transform(X_combined), 
-                                columns=X_combined.columns)
+    X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
 
-    # Step 9: Display normalized features
     with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
-        st.write(X_normalized.head(5))  # Display first 5 rows of normalized features
+        st.write(X_normalized.head(5))  # Display the first 5 rows of normalized features
 
-# Step 10: Prepare Y (Target variable)
+# Step 5: Prepare Y (Target variable)
 y = df.iloc[:, -1]  # Extract the target variable
 
 with st.expander('🎯 Y (Target variable) (first 5 rows)'):
