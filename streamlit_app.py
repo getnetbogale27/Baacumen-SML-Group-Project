@@ -525,100 +525,6 @@ with st.expander("Show Segmentation Analysis"):
 st.header("Step 3: Feature Selection and Data Splitting")
 st.subheader("3.1 Feature Selection")
 
-# churn_risk_score = df.pop('churn_risk_score')  # Remove the column
-# df['churn_risk_score'] = churn_risk_score  # Append it to the end
-
-# with st.expander('🔢 Raw data (first 5 rows) including newly computed features before spliting to train and test set'):
-#     st.write(df.head(5))  # Display first 5 rows of raw data
-
-# with st.expander('🧩 X (Features) (first 5 rows)'):
-#     X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  
-#     st.write(X.head(5)) 
-
-# with st.expander('🎯 Y (Target variable) (first 5 rows)'):
-#     y = df.iloc[:, -1]  
-#     st.write(y.head(5).reset_index(drop=True))
-
-
-# # Step 1: Rearrange the churn_risk_score column
-# churn_risk_score = df.pop('churn_risk_score')  # Remove the column
-# df['churn_risk_score'] = churn_risk_score  # Append it to the end
-
-# # Step 2: Display raw data
-# with st.expander('🔢 Raw data (first 5 rows) including newly computed features before splitting'):
-#     st.write(df.head(5))  # Display first 5 rows of raw data
-
-# # Step 3: Prepare X (Features) and handle non-numeric data
-# X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
-
-# # Ensure only numeric columns are used
-# X_numeric = X.select_dtypes(include=['number'])
-
-# # Check for missing values
-# if X_numeric.isnull().values.any():
-#     st.error("The dataset contains missing values. Please handle them before scaling.")
-# else:
-#     # Normalize the numeric features
-#     scaler = MinMaxScaler()
-#     X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
-
-#     with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
-#         st.write(X_normalized.head(5))  # Display first 5 rows of normalized features
-
-# # Step 4: Prepare Y (Target variable)
-# y = df.iloc[:, -1]  # Extract the target variable
-
-# with st.expander('🎯 Y (Target variable) (first 5 rows)'):
-#     st.write(y.head(5).reset_index(drop=True))  # Display the first 5 rows of the target variable
-
-
-
-
-
-# # Step 1: Rearrange the churn_risk_score column
-# churn_risk_score = df.pop('churn_risk_score')  # Remove the column
-# df['churn_risk_score'] = churn_risk_score  # Append it to the end
-
-# # Step 2: Display raw data
-# with st.expander('🔢 Raw data (first 5 rows) including newly computed features before splitting'):
-#     st.write(df.head(5))  # Display first 5 rows of raw data
-
-# # Step 3: Prepare X (Features)
-# X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
-
-# # Step 4: One-Hot Encode Categorical Columns
-# X_encoded = pd.get_dummies(X, drop_first=True)  # Drop the first category to avoid dummy variable trap
-
-# # Step 5: Normalize Numeric Features
-# X_numeric = X_encoded.select_dtypes(include=['number'])  # Select only numeric columns for normalization
-
-# # Check for missing values in the numeric columns
-# if X_numeric.isnull().values.any():
-#     st.error("The dataset contains missing values. Please handle them before scaling.")
-# else:
-#     # Normalize the numeric features
-#     scaler = MinMaxScaler()
-#     X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
-
-#     # Combine normalized features with one-hot encoded columns
-#     X_final = pd.concat([X_normalized, X_encoded.drop(columns=X_numeric.columns)], axis=1)
-
-#     with st.expander('🧩 X (Features) (first 5 rows) - Normalized and One-Hot Encoded'):
-#         st.write(X_final.head(5))  # Display first 5 rows of final features
-
-# # Step 6: Prepare Y (Target variable)
-# y = df.iloc[:, -1]  # Extract the target variable
-
-# with st.expander('🎯 Y (Target variable) (first 5 rows)'):
-#     st.write(y.head(5).reset_index(drop=True))  # Display the first 5 rows of the target variable
-
-
-
-
-
-
-
-
 # Step 1: Rearrange the churn_risk_score column
 churn_risk_score = df.pop('churn_risk_score')  # Remove the column
 df['churn_risk_score'] = churn_risk_score  # Append it to the end
@@ -666,12 +572,8 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 
+# Feature Selection Steps
 
-
-
-
-# 1. Define X (features) and y (target variable)
-# X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn_risk_score'])
 # Step 1: Drop unnecessary columns
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id'])
 
@@ -692,14 +594,8 @@ X_normalized = pd.DataFrame(scaler.fit_transform(X[numerical_cols]), columns=num
 # Combine encoded and normalized features
 X_final = pd.concat([X_normalized, X_encoded], axis=1)
 
-# Display feature set in Streamlit
-with st.expander('X'):
-    st.write(X_final.head(5).reset_index(drop=True))
-
 # Target variable
 y = df['churn_risk_score']
-with st.expander('y'):
-    st.write(y.head(5).reset_index(drop=True))
 
 # Step 2: Apply Chi-Square Feature Selection
 chi2_selector = SelectKBest(chi2, k='all')
@@ -741,6 +637,8 @@ with st.expander("🔍 Feature Importance and Predictions"):
 
 
 
+
+
 st.subheader("3.2 Data Splitting")
 # Define split ratios
 ratios = [0.1, 0.15, 0.2, 0.25, 0.3]
@@ -753,7 +651,7 @@ os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
 # Loop through each ratio to split and save datasets
 for ratio in ratios:
     # Splitting the dataset
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=ratio, stratify=y, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=ratio, stratify=y, random_state=42)
 
     # Create DataFrames for training and testing sets
     train_df = pd.DataFrame(X_train)
