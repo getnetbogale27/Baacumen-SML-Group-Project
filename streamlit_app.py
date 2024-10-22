@@ -577,22 +577,27 @@ df['churn_risk_score'] = churn_risk_score  # Append it to the end
 with st.expander('🔢 Raw data (first 5 rows) including newly computed features before splitting'):
     st.write(df.head(5))  # Display first 5 rows of raw data
 
-# Step 3: Prepare X (Features) and handle non-numeric data
+# Step 3: Prepare X (Features) including numeric and categorical variables
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
 
-# Step 3a: One-hot encode categorical features
-X = pd.get_dummies(X, drop_first=True)
+# Separate numeric and categorical columns
+numeric_cols = X.select_dtypes(include=['number']).columns
+categorical_cols = X.select_dtypes(exclude=['number']).columns
 
-# Step 3b: Ensure only numeric columns are used
-X_numeric = X.select_dtypes(include=['number'])
+# Encode categorical columns using OneHotEncoder
+encoder = OneHotEncoder(sparse=False, drop='first')  # Drop first to avoid multicollinearity
+X_encoded = pd.DataFrame(encoder.fit_transform(X[categorical_cols]), columns=encoder.get_feature_names_out(categorical_cols))
 
-# Check for missing values
-if X_numeric.isnull().values.any():
+# Combine numeric and encoded categorical data
+X_combined = pd.concat([X[numeric_cols].reset_index(drop=True), X_encoded.reset_index(drop=True)], axis=1)
+
+# Check for missing values before normalization
+if X_combined.isnull().values.any():
     st.error("The dataset contains missing values. Please handle them before scaling.")
 else:
-    # Normalize the numeric features
+    # Normalize the combined features
     scaler = MinMaxScaler()
-    X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
+    X_normalized = pd.DataFrame(scaler.fit_transform(X_combined), columns=X_combined.columns)
 
     with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
         st.write(X_normalized.head(5))  # Display first 5 rows of normalized features
@@ -602,6 +607,9 @@ y = df.iloc[:, -1]  # Extract the target variable
 
 with st.expander('🎯 Y (Target variable) (first 5 rows)'):
     st.write(y.head(5).reset_index(drop=True))  # Display the first 5 rows of the target variable
+
+
+
 
 
 
