@@ -419,17 +419,17 @@ with st.expander("Data Visualizations"):
 
 
 
-# New set of features to handle outliers
+# New set of features to visualize and handle
 new_features = [
     'customer_tenure', 'login_frequency', 'avg_engagement_score', 
     'recency', 'engagement_score', 'churn_history', 
     'points_utilization_rate', 'offer_responsiveness'
 ]
 
-# Store a copy of the original data for the new features
+# Store a copy of original data for comparison (before handling)
 df_new_before_handling = df[new_features].copy()
 
-# Applying IQR method to handle outliers
+# Apply IQR method to handle outliers
 for feature in new_features:
     Q1 = df[feature].quantile(0.25)
     Q3 = df[feature].quantile(0.75)
@@ -439,32 +439,32 @@ for feature in new_features:
     lower_bound = Q1 - 1.5 * IQR
     upper_bound = Q3 + 1.5 * IQR
 
-    # Handle outliers by clipping to lower and upper bounds
+    # Handle outliers by clipping values
     df[feature] = df[feature].clip(lower=lower_bound, upper=upper_bound)
 
-# Create boxplots for the new features before and after handling
-fig5, axs5 = plt.subplots(2, 4, figsize=(20, 10))  # Before handling
-fig6, axs6 = plt.subplots(2, 4, figsize=(20, 10))  # After handling
+# Create a figure with 8 rows, 2 columns (side-by-side before & after for each feature)
+fig, axs = plt.subplots(len(new_features), 2, figsize=(20, 40))
 
-# Plotting boxplots for the new features
+# Plot side-by-side boxplots for each feature
 for i, feature in enumerate(new_features):
-    row, col = divmod(i, 4)  # Determine subplot position
+    # Boxplot (Before Handling)
+    sns.boxplot(x=df_new_before_handling[feature], ax=axs[i, 0])
+    axs[i, 0].set_title(f'{feature.replace("_", " ").title()} (Before Handling)')
 
-    # Boxplot before handling
-    sns.boxplot(x=df_new_before_handling[feature], ax=axs5[row, col])
-    axs5[row, col].set_title(f'Boxplot of {feature.replace("_", " ").title()} (Before Handling)')
+    # Boxplot (After Handling)
+    sns.boxplot(x=df[feature], ax=axs[i, 1])
+    axs[i, 1].set_title(f'{feature.replace("_", " ").title()} (After Handling)')
 
-    # Boxplot after handling
-    sns.boxplot(x=df[feature], ax=axs6[row, col])
-    axs6[row, col].set_title(f'Boxplot of {feature.replace("_", " ").title()} (After Handling)')
+    # Adjust y-axis scale to match between the two plots for fair comparison
+    axs[i, 1].set_ylim(axs[i, 0].get_ylim())
 
-# Adjust layout
+# Adjust layout for better visualization
 plt.tight_layout()
 
-# Streamlit: Display the new boxplots in an expander
-with st.expander('📊 Boxplots for Outlier Visualization and Handling (New Features)'):
-    st.pyplot(fig5)  # Before handling
-    st.pyplot(fig6)  # After handling
+# Streamlit: Display the side-by-side boxplots in an expander
+with st.expander('📊 Side-by-Side Boxplots for Outlier Visualization and Handling (New Features)'):
+    st.pyplot(fig)
+    
 
 
 
