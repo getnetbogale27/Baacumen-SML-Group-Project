@@ -568,18 +568,9 @@ rf.fit(X_train, y_train)
 st.success("Random Forest model trained successfully!")
 
 # 5. Display Results in One Expander
-with st.expander("🔍 Feature Selection and Importance"):
-    # Display Chi-Square Scores
-    chi2_scores = pd.Series(chi2_selector.scores_, index=numeric_columns.columns).sort_values(ascending=False)
+with st.expander("🔍 Feature Importance and Predictions"):
+    # Display the top 10 features based on Chi-Square
     st.write("Top 10 features based on Chi-Square:", list(selected_kbest_features))
-
-    # Plot Feature Importance (Chi-Square)
-    fig_chi2, ax = plt.subplots(figsize=(10, 6))
-    chi2_scores.head(10).plot(kind='barh', ax=ax, color='lightgreen')
-    ax.set_title("Top 10 Chi-Square Feature Importances")
-    ax.set_xlabel("Chi-Square Score")
-    ax.invert_yaxis()
-    st.pyplot(fig_chi2)
 
     # Plot Feature Importance (Random Forest)
     rf_feature_importance = pd.Series(rf.feature_importances_, index=numeric_columns.columns).sort_values(ascending=False)
