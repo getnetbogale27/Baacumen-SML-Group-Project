@@ -551,34 +551,24 @@ categorical_columns = [
     'complaint_status', 'feedback', 'tenure_category'
 ]
 
-numeric_columns = [
-    'age',
-    'days_since_last_login',
-    'avg_time_spent',
-    'avg_transaction_value',
-    'points_in_wallet',
-    'customer_tenure',
-    'login_frequency',
-    'avg_engagement_score',
-    'recency',
-    'engagement_score',
-    'points_utilization_rate',
-    'churn_history',
+# Include numerical columns
+numerical_columns = [
+    'age', 'days_since_last_login', 'avg_time_spent', 'avg_transaction_value',
+    'points_in_wallet', 'customer_tenure', 'login_frequency', 'avg_engagement_score',
+    'recency', 'engagement_score', 'points_utilization_rate', 'churn_history',
     'offer_responsiveness'
 ]
 
-# Combine categorical and numerical columns
-all_columns = categorical_columns + numeric_columns
-
-# Encoding categorical variables and creating the final feature set
+# Combine both categorical and numerical columns
 X_encoded = pd.get_dummies(X, columns=categorical_columns, drop_first=True)
-X_non_negative = X_encoded[all_columns].clip(lower=0)
+X_encoded = X_encoded[numerical_columns + list(X_encoded.columns.difference(numerical_columns))]  # Ensure numerical columns are preserved
+X_non_negative = X_encoded.clip(lower=0)
 X_non_negative.fillna(X_non_negative.mean(), inplace=True)
 
 # 3. Feature Selection with Chi-Square for all features
 chi2_selector = SelectKBest(chi2, k='all')  # Use 'all' to consider all features
 X_kbest = chi2_selector.fit_transform(X_non_negative, y)
-chi2_scores = pd.Series(chi2_selector.scores_, index=X_non_negative.columns).sort_values(ascending=False)
+chi2_scores = pd.Series(chi2_selector.scores_, index=X_encoded.columns).sort_values(ascending=False)
 
 # 4. Train Random Forest
 X_train, X_test, y_train, y_test = train_test_split(X_non_negative, y, test_size=0.2, random_state=42)
@@ -601,7 +591,7 @@ with st.expander("🔍 Feature Importance and Predictions"):
     st.pyplot(fig_chi2)
 
     # Plot Feature Importance (Random Forest)
-    rf_feature_importance = pd.Series(rf.feature_importances_, index=X_non_negative.columns).sort_values(ascending=False)
+    rf_feature_importance = pd.Series(rf.feature_importances_, index=X_encoded.columns).sort_values(ascending=False)
     fig_rf, ax = plt.subplots(figsize=(10, 6))
     rf_feature_importance.plot(kind='barh', ax=ax, color='skyblue')
     ax.set_title("Random Forest Feature Importances")
