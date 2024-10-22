@@ -420,23 +420,58 @@ with st.expander("Data Visualizations"):
 # detect_outliers_iqr(df, numerical_columns)
 # detect_outliers_iqr(df, numerical_columns)
 
-# Create an expander for boxplot visualization
-with st.expander("Treating Outlier for newly computed features"):
-    # Set up the matplotlib figure
-    plt.figure(figsize=(15, 10))
+# # Create an expander for boxplot visualization
+# with st.expander("Treating Outlier for newly computed features"):
+#     # Set up the matplotlib figure
+#     plt.figure(figsize=(15, 10))
     
-    # Create subplots for each numerical variable
-    num_columns = 2  # Number of columns in the subplot grid
-    num_rows = (len(numerical_columns) + num_columns - 1) // num_columns  # Calculate number of rows needed
+#     # Create subplots for each numerical variable
+#     num_columns = 2  # Number of columns in the subplot grid
+#     num_rows = (len(numerical_columns) + num_columns - 1) // num_columns
     
-    for idx, column in enumerate(numerical_columns):
-        plt.subplot(num_rows, num_columns, idx + 1)  # Subplot indexing starts at 1
-        sns.boxplot(x=df[column])
-        plt.title(f'Boxplot of {column}')
+#     for idx, column in enumerate(numerical_columns):
+#         plt.subplot(num_rows, num_columns, idx + 1)
+#         sns.boxplot(x=df[column])
+#         plt.title(f'Boxplot of {column}')
 
-    # Show the plots
-    plt.tight_layout()
-    st.pyplot(plt)
+#     # Show the plots
+#     plt.tight_layout()
+#     st.pyplot(plt)
+
+
+
+# Initialize figure and axes for new set of boxplots (2 rows x 4 columns)
+fig3, axs3 = plt.subplots(2, 4, figsize=(20, 10))
+
+# Define the feature names
+features = [
+    'customer_tenure', 'login_frequency', 'avg_engagement_score', 
+    'recency', 'engagement_score', 'churn_history', 
+    'points_utilization_rate', 'offer_responsiveness'
+]
+
+# Iterate through features and create boxplots for 'before' and 'after' handling
+for i, feature in enumerate(features):
+    row, col = divmod(i, 4)  # Determine subplot position
+    sns.boxplot(x=df_before_handling[feature], ax=axs3[row, col])
+    axs3[row, col].set_title(f'Boxplot of {feature.replace("_", " ").title()} (Before Handling)')
+
+fig4, axs4 = plt.subplots(2, 4, figsize=(20, 10))  # After handling
+
+for i, feature in enumerate(features):
+    row, col = divmod(i, 4)  # Determine subplot position
+    sns.boxplot(x=df[feature], ax=axs4[row, col])
+    axs4[row, col].set_title(f'Boxplot of {feature.replace("_", " ").title()} (After Handling)')
+
+# Layout adjustment
+plt.tight_layout()
+
+# Streamlit visualization with expanders
+with st.expander('📊 Boxplots for Outlier Visualization and Handling'):
+    st.pyplot(fig3)  # Boxplots before handling
+    st.pyplot(fig4)  # Boxplots after handling
+
+
 
 
 
