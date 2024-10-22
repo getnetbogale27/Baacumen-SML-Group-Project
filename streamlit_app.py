@@ -514,27 +514,18 @@ with st.expander("Show Segmentation Analysis"):
 
 st.header("Step 3: Feature Selection and Data Splitting")
 st.subheader("3.1 Feature Selection")
-# Select numerical columns for correlation analysis
-numerical_columns = df.select_dtypes(include=[np.number]).columns
+# Fit a Random Forest model to estimate feature importance
+rf = RandomForestClassifier(random_state=42)
+rf.fit(X, y)
 
-# Compute the correlation matrix
-corr_matrix = data_one_hot_encoded[numerical_columns].corr().abs()
+# Select features with importance above the mean
+selector = SelectFromModel(rf, threshold='mean', prefit=True)
+selected_features = X.columns[(selector.get_support())]
 
-# Select upper triangle of the correlation matrix
-upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+st.write(f'Selected features based on Random Forest: {list(selected_features)}')
 
-# Identify columns with correlation > 0.85 (you can adjust the threshold)
-to_drop = [column for column in upper.columns if any(upper[column] > 0.85)]
-
-st.write(f'Features to drop due to high correlation: {to_drop}')
-
-# Drop highly correlated features
-df_reduced = data_one_hot_encoded.drop(columns=to_drop)
-
-with st.expander("🔍 Correlation Heatmap"):
-    plt.figure(figsize=(12, 8))
-    sns.heatmap(corr_matrix, cmap='coolwarm', annot=True, fmt='.2f', linewidths=0.5)
-    st.pyplot(plt)
+# Create a DataFrame with only the selected features
+df_selected = X[selected_features]
 
 
 
