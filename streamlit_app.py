@@ -672,10 +672,10 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 # 1. Define X (features) and y (target variable)
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn_risk_score'])
-with st.expander ('X')
+with st.expander ('X'):
     st.write(X.head(5).reset_index(drop=True))
 y = df['churn_risk_score']
-with st.expander ('y')
+with st.expander ('y'):
     st.write(y.head(5).reset_index(drop=True))
 
 
