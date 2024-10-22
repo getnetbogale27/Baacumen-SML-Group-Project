@@ -311,6 +311,7 @@ numerical_columns = [
     'customer_tenure',
     'login_frequency',
     'avg_engagement_score',
+    'avg_frequency_login_days',
     'recency',
     'engagement_score',
     'points_utilization_rate',
@@ -387,6 +388,7 @@ numerical_columns = [
     'age', 
     'avg_time_spent', 
     'avg_transaction_value', 
+    'avg_frequency_login_days',
     'points_in_wallet', 
     'customer_tenure', 
     'login_frequency', 
@@ -635,14 +637,8 @@ numerical_cols = X.select_dtypes(include=['number']).columns.tolist()
 # Step 4: Check for missing values
 missing_values = X[numerical_cols].isnull().sum()
 if missing_values.any():
-    st.warning(f"The following columns have missing values:\n{missing_values[missing_values > 0]}")
-    # Option 1: Fill missing values (imputation)
-    # You can fill with the mean, median, or any other strategy
-    # For example, filling with the mean:
+    # st.warning(f"The following columns have missing values:\n{missing_values[missing_values > 0]}")
     X[numerical_cols] = X[numerical_cols].fillna(X[numerical_cols].median())
-
-    # Option 2: Alternatively, drop rows with missing values
-    # X = X.dropna()
 
 # Step 5: One-Hot Encode Categorical Columns (excluding numerical columns)
 X_encoded = pd.get_dummies(X[categorical_cols], drop_first=True)  # One-hot encode categorical variables
