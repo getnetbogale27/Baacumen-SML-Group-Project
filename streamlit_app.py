@@ -671,7 +671,33 @@ with st.expander('🎯 Y (Target variable) (first 5 rows)'):
 
 
 # 1. Define X (features) and y (target variable)
-X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn_risk_score'])
+# X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn_risk_score'])
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
+
+# Identify categorical and numerical columns
+categorical_cols = X.select_dtypes(include=['object']).columns.tolist()
+numerical_cols = X.select_dtypes(include=['number']).columns.tolist()
+
+# Step 4: Check for missing values
+missing_values = X[numerical_cols].isnull().sum()
+if missing_values.any():
+    # st.warning(f"The following columns have missing values:\n{missing_values[missing_values > 0]}")
+    X[numerical_cols] = X[numerical_cols].fillna(X[numerical_cols].median())
+
+# Step 5: One-Hot Encode Categorical Columns (excluding numerical columns)
+X_encoded = pd.get_dummies(X[categorical_cols], drop_first=True)  # One-hot encode categorical variables
+
+# Step 6: Normalize Numeric Features
+X_numeric = X[numerical_cols]  # Select numeric columns for normalization
+
+# Normalize the numeric features
+scaler = MinMaxScaler()
+X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
+
+# Combine normalized features with one-hot encoded columns
+X_final = pd.concat([X_normalized, X_encoded], axis=1)
+
+
 with st.expander ('X'):
     st.write(X.head(5).reset_index(drop=True))
 y = df['churn_risk_score']
