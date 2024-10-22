@@ -573,21 +573,33 @@ df['churn_risk_score'] = churn_risk_score  # Append it to the end
 
 # Step 2: Display raw data (first 5 rows)
 with st.expander('🔢 Raw Data (first 5 rows) including new features before splitting'):
-    st.write(df.head(5))  # Display first 5 rows of raw data
+    st.write(df.head(5))  # Display the first 5 rows of raw data
 
-# Step 3: Prepare X (Features) and handle non-numeric data
-X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
+# Step 3: Prepare X (Features) with numeric and categorical data
+# Drop unnecessary columns
+X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id', 'churn_risk_score'])
 
-# Ensure only numeric columns are selected
+# Separate numeric and categorical columns
 X_numeric = X.select_dtypes(include=['number'])
+X_categorical = X.select_dtypes(include=['object', 'category'])
+
+# Handle categorical data using One-Hot Encoding
+if not X_categorical.empty:
+    encoder = OneHotEncoder(sparse=False, drop='first')  # Drop first to avoid multicollinearity
+    X_encoded = pd.DataFrame(encoder.fit_transform(X_categorical), columns=encoder.get_feature_names_out(X_categorical.columns))
+else:
+    X_encoded = pd.DataFrame()  # No categorical data
+
+# Combine numeric and encoded categorical data
+X_combined = pd.concat([X_numeric, X_encoded], axis=1)
 
 # Check for missing values
-if X_numeric.isnull().values.any():
+if X_combined.isnull().values.any():
     st.error("⚠️ The dataset contains missing values. Please handle them before scaling.")
 else:
-    # Normalize the numeric features
+    # Normalize the combined features
     scaler = MinMaxScaler()
-    X_normalized = pd.DataFrame(scaler.fit_transform(X_numeric), columns=X_numeric.columns)
+    X_normalized = pd.DataFrame(scaler.fit_transform(X_combined), columns=X_combined.columns)
 
     with st.expander('🧩 X (Features) (first 5 rows) - Normalized'):
         st.write(X_normalized.head(5))  # Display the first 5 rows of normalized features
