@@ -580,7 +580,7 @@ with st.expander('🔢 Raw data (first 5 rows) including newly computed features
 # Step 3: Prepare X (Features)
 X = df.drop(columns=['customer_id', 'Name', 'security_no', 'referral_id']).iloc[:, :-1]  # Drop unnecessary columns
 
-# Step 4: Ensure `avg_frequency_login_days` is numeric
+# Step 4: Ensure 'avg_frequency_login_days' is treated as numeric
 X['avg_frequency_login_days'] = pd.to_numeric(X['avg_frequency_login_days'], errors='coerce')
 
 # Step 5: One-Hot Encode Categorical Columns
