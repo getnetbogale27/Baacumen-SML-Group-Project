@@ -925,7 +925,6 @@ with st.expander("⚙️ K-Fold Cross-Validation", expanded=False):
 
     # Optionally, we can visualize the scores
     import matplotlib.pyplot as plt
-
     plt.figure(figsize=(8, 4))
     plt.plot(range(1, k + 1), cv_scores, marker='o', linestyle='-', color='b')
     plt.title('K-Fold Cross-Validation F1-Scores')
@@ -1016,35 +1015,43 @@ if st.button('Submit'):
 
 
 
-with st.expander('📈 Data visualization'):
-    st.scatter_chart(data=df, x='Ch_age_mon', y='Care_age',
-                     color='Nutrition_Status')
 
-
-# Split data for training and testing
-X = df.iloc[:, 3:-1]  # Features (independent variables)
-y = df['Nutrition_Status']  # Target (dependent variable)
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42)
+#Split data for training and testing
+# X_final = pd.concat([X_normalized, X_encoded], axis=1)
+# y = df['Nutrition_Status']  # Target (dependent variable)
+# X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=0.25, random_state=42)
 
 # Cache the model training
 
 
-@st.cache_data
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=0.25, random_state=42)
+
+# Cache the model training
+@st.cache_resource
 def train_model(X_train, y_train):
-    model = RandomForestClassifier()
+    model = GradientBoostingClassifier()
     model.fit(X_train, y_train)
     return model
 
-
+# Train the model
 model = train_model(X_train, y_train)
 
-# Prepare input data
-X_columns = X.columns
+# Prepare input data function
+def encode_inputs(X_columns):
+    # Example input collection using Streamlit's number_input
+    input_values = [st.number_input(f'{col}', key=col) for col in X_columns]
+    input_data = np.array(input_values).reshape(1, -1)  # Reshape for prediction
+    return input_data
+
+# Get the columns from your final dataset
+X_columns = X_final.columns
+
+# Prepare the input data
 input_data = encode_inputs(X_columns)
 
-# Predict and display the result
-if st.button('👉 Click Me to Predict Nutrition Status'):
+# Predict and display results when button is clicked
+if st.button('👉 Click Me to Churn Risk Score'):
     # Predict probabilities for each class
     prediction_proba = model.predict_proba(input_data)[0]
 
@@ -1052,33 +1059,34 @@ if st.button('👉 Click Me to Predict Nutrition Status'):
     with st.expander('📊 Predicted Probabilities'):
         st.subheader('Predicted Probabilities')
 
-        # Define the category labels
-        categories = ['Normal (N)', 'Underweight Only (U)', 'Stunted Only (S)', 'Wasted Only (W)',
-                      'Underweight and Stunted (US)', 'Underweight and Wasted (UW)',
-                      'Stunted and Wasted (SW)', 'Underweight, Stunted and Wasted (USW)']
+        # Define the category labels as numbers from 1 to 5
+        categories = [1, 2, 3, 4, 5]
 
-        # Create a DataFrame for displaying probabilities
+        # Create DataFrame for displaying probabilities
         df_prediction_proba = pd.DataFrame({
             'Category': categories,
             'Probability': prediction_proba
         })
 
         # Display probabilities using Streamlit's dataframe component
-        st.dataframe(df_prediction_proba,
-                     column_config={
-                         'Category': st.column_config.TextColumn('Category', width='medium'),
-                         'Probability': st.column_config.ProgressColumn(
-                             'Probability',
-                             format='%f',
-                             width='medium',
-                             min_value=0,
-                             max_value=1
-                         )
-                     }, hide_index=True)
+        st.dataframe(
+            df_prediction_proba,
+            column_config={
+                'Category': st.column_config.TextColumn('Category', width='medium'),
+                'Probability': st.column_config.ProgressColumn(
+                    'Probability', format='%f', width='medium', min_value=0, max_value=1
+                )
+            },
+            hide_index=True
+        )
 
         # Display the predicted category with the highest probability
         predicted_category = categories[np.argmax(prediction_proba)]
         st.success(f'Predicted Category: {predicted_category}')
+
+
+
+
 
 # Model Evaluation Expander
 with st.expander('🧠 Model Evaluation'):
@@ -1093,27 +1101,6 @@ with st.expander('🧠 Model Evaluation'):
     # Display classification report
     st.write('Classification Report:')
     st.text(classification_report(y_test, y_pred))
-
-
-# Feature Importance Expander
-with st.expander('🏆 Feature Importance'):
-    st.subheader('Feature Importance')
-
-    # Get feature importances
-    importances = model.feature_importances_
-    indices = importances.argsort()[::-1]
-    feature_names = X.columns[indices]
-
-    # Create a figure and axis explicitly
-    fig, ax = plt.subplots()
-    ax.bar(range(X.shape[1]), importances[indices], align='center')
-    ax.set_title('Feature Importances')
-    ax.set_xticks(range(X.shape[1]))
-    ax.set_xticklabels(feature_names, rotation=90)
-    ax.set_xlim([-1, X.shape[1]])
-
-    # Display the plot in Streamlit
-    st.pyplot(fig)
 
 # Generate predictions probabilities for the positive class
 # Probabilities for the positive class
