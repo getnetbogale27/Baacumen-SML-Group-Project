@@ -769,6 +769,87 @@ with st.expander("⚙️ View Model Performance Across Different Split Ratios", 
 st.header("Step 4: Model Building")
 st.subheader("4.1 Algorithm Selection")
 
+# Initialize the expander
+with st.expander("⚙️ View Model Performance Comparison Across Models", expanded=False):
+
+    # Define models to train
+    models = {
+        'Logistic Regression': LogisticRegression(max_iter=1000),
+        'Decision Tree': DecisionTreeClassifier(),
+        'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
+        'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42)
+    }
+
+    # Define the best split ratio
+    best_ratio = 0.25
+
+    # Split the data into train and test sets based on the best ratio
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_final, y, test_size=best_ratio, random_state=42
+    )
+
+    results = []
+
+    # Train and evaluate each model
+    for model_name, model in models.items():
+        model.fit(X_train, y_train)
+
+        # Make predictions
+        y_pred = model.predict(X_test)
+        y_prob = model.predict_proba(X_test)
+
+        # Binarize labels if multi-class
+        if len(np.unique(y)) > 2:
+            y_test_binarized = label_binarize(y_test, classes=np.unique(y))
+            auc_roc = roc_auc_score(y_test_binarized, y_prob, multi_class='ovr')
+        else:
+            auc_roc = roc_auc_score(y_test, y_prob[:, 1])
+
+        # Calculate metrics
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
+        recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
+        f1 = f1_score(y_test, y_pred, average='weighted')
+
+        # Store the results
+        results.append({
+            'Model': model_name,
+            'Accuracy': accuracy,
+            'Precision': precision,
+            'Recall': recall,
+            'F1-Score': f1,
+            'AUC-ROC': auc_roc
+        })
+
+    # Convert results into a DataFrame
+    results_df = pd.DataFrame(results)
+
+    # Display the DataFrame
+    st.write("### Model Performance Table")
+    st.dataframe(results_df.style.format({
+        'Accuracy': '{:.6f}',
+        'Precision': '{:.6f}',
+        'Recall': '{:.6f}',
+        'F1-Score': '{:.6f}',
+        'AUC-ROC': '{:.6f}'
+    }))
+
+    # Plot the metrics for comparison
+    st.write("### Performance Metrics Chart")
+    st.bar_chart(results_df.set_index('Model')[['Accuracy', 'F1-Score', 'AUC-ROC']])
+
+    # Find the best model based on F1-Score
+    best_model = results_df.loc[results_df['F1-Score'].idxmax()]
+    st.write(
+        f"**Best Model:** {best_model['Model']} "
+        f"(F1-Score: {best_model['F1-Score']:.2f})"
+    )
+
+
+
+
+
+
 # Provide a hint for the best split ratio
 st.info("💡 Hint: The best split ratio is **25% test size / 75% train size** for this dataset.")
 
