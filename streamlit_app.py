@@ -780,7 +780,7 @@ with st.expander("⚙️ View Model Performance Comparison Across Models", expan
         'Decision Tree': DecisionTreeClassifier(),
         'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
         'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42),
-        'Support Vector Machine': SVC(probability=True)  # Enable probability estimates
+        'Support Vector Machine': SVC(probability=True)  # Add SVM here
     }
 
     # Define the best split ratio
