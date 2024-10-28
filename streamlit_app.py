@@ -1010,11 +1010,11 @@ def train_model(X_train, y_train):
 with st.spinner('Training the model...'):
     model = train_model(X_train, y_train)
 
-# # Prepare input data function
-# def encode_inputs(X_columns):
-#     input_values = [st.number_input(f'{col}', key=col) for col in X_columns]
-#     input_data = np.array(input_values).reshape(1, -1)  # Reshape for prediction
-#     return input_data
+# Prepare input data function
+def encode_inputs(X_columns):
+    input_values = [st.number_input(f'{col}', key=col) for col in X_columns]
+    input_data = np.array(input_values).reshape(1, -1)
+    return input_data
 
 # Get the columns from your final dataset
 X_columns = X_final.columns
@@ -1023,7 +1023,7 @@ X_columns = X_final.columns
 input_data = encode_inputs(X_columns)
 
 # Predict and display results when button is clicked
-if st.button('👉 Click Me to Churn Risk Score'):
+if st.button('👉 Click Me to Calculate Churn Risk Score'):
     with st.spinner('Calculating churn risk...'):
         # Predict probabilities for each class
         prediction_proba = model.predict_proba(input_data)[0]
@@ -1032,7 +1032,7 @@ if st.button('👉 Click Me to Churn Risk Score'):
         st.bar_chart(prediction_proba, use_container_width=True)
 
         # Display the predicted category with the highest probability
-        predicted_category = np.argmax(prediction_proba) + 1  # Assuming categories start from 1
+        predicted_category = np.argmax(prediction_proba) + 1  # categories start from 1
         st.success(f'Predicted Category: {predicted_category}')
 
 
