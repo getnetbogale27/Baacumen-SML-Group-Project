@@ -696,43 +696,53 @@ with st.expander('Dataset Previews (Train Vs Test)'):
 
 st.header("Step 3: Data Splitting Comparison")
 
-ratios = [0.1, 0.15, 0.2, 0.25, 0.3]
-results = []
+# Initialize the expander
+with st.expander("View Model Performance Across Different Split Ratios", expanded=True):
 
-for ratio in ratios:
-    X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=ratio, random_state=42)
-    model = LogisticRegression(max_iter=1000)
-    model.fit(X_train, y_train)
+    # Define the different ratios to test
+    ratios = [0.1, 0.15, 0.2, 0.25, 0.3]
+    results = []
 
-    y_pred = model.predict(X_test)
-    y_prob = model.predict_proba(X_test)
+    # Iterate over each ratio to train and evaluate the model
+    for ratio in ratios:
+        X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=ratio, random_state=42)
+        model = LogisticRegression(max_iter=1000)
+        model.fit(X_train, y_train)
 
-    # Binarize labels if multi-class
-    y_test_binarized = label_binarize(y_test, classes=np.unique(y))
+        # Make predictions
+        y_pred = model.predict(X_test)
+        y_prob = model.predict_proba(X_test)
 
-    # Calculate metrics
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
-    recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
-    f1 = f1_score(y_test, y_pred, average='weighted')
+        # Binarize labels for multi-class AUC-ROC calculation
+        y_test_binarized = label_binarize(y_test, classes=np.unique(y))
 
-    # Handle AUC-ROC for multi-class case
-    auc_roc = roc_auc_score(y_test_binarized, y_prob, multi_class='ovr')
+        # Calculate metrics
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
+        recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
+        f1 = f1_score(y_test, y_pred, average='weighted')
+        auc_roc = roc_auc_score(y_test_binarized, y_prob, multi_class='ovr')
 
-    results.append({
-        'Test Size': ratio,
-        'Accuracy': accuracy,
-        'Precision': precision,
-        'Recall': recall,
-        'F1-Score': f1,
-        'AUC-ROC': auc_roc
-    })
+        # Store the results
+        results.append({
+            'Test Size': ratio,
+            'Accuracy': accuracy,
+            'Precision': precision,
+            'Recall': recall,
+            'F1-Score': f1,
+            'AUC-ROC': auc_roc
+        })
 
-results_df = pd.DataFrame(results)
-st.dataframe(results_df)
-st.line_chart(results_df.set_index('Test Size')[['Accuracy', 'F1-Score', 'AUC-ROC']])
-best_split = results_df.loc[results_df['F1-Score'].idxmax()]
-st.write(f"Best Split Ratio: {best_split['Test Size']} (F1-Score: {best_split['F1-Score']:.2f})")
+    # Display the results in a DataFrame
+    results_df = pd.DataFrame(results)
+    st.dataframe(results_df)
+
+    # Plot the metrics across different split ratios
+    st.line_chart(results_df.set_index('Test Size')[['Accuracy', 'F1-Score', 'AUC-ROC']])
+
+    # Find the best split based on F1-Score
+    best_split = results_df.loc[results_df['F1-Score'].idxmax()]
+    st.write(f"Best Split Ratio: {best_split['Test Size']} (F1-Score: {best_split['F1-Score']:.2f})")
 
 
 
