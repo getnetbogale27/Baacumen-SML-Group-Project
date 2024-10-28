@@ -819,20 +819,20 @@ with st.expander("⚙️ Train Model and View Performance", expanded=True):
     recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
     f1 = f1_score(y_test, y_pred, average='weighted')
 
-    # Display performance metrics
-    st.write("### Model Performance Metrics")
-    st.metric("Accuracy", f"{accuracy:.6f}")
-    st.metric("Precision", f"{precision:.6f}")
-    st.metric("Recall", f"{recall:.6f}")
-    st.metric("F1-Score", f"{f1:.6f}")
-    st.metric("AUC-ROC", f"{auc_roc:.6f}")
+    # # Display performance metrics
+    # st.write("### Model Performance Metrics")
+    # st.metric("Accuracy", f"{accuracy:.6f}")
+    # st.metric("Precision", f"{precision:.6f}")
+    # st.metric("Recall", f"{recall:.6f}")
+    # st.metric("F1-Score", f"{f1:.6f}")
+    # st.metric("AUC-ROC", f"{auc_roc:.6f}")
 
     # Display detailed metrics in a table
     metrics_df = pd.DataFrame({
         'Metric': ['Accuracy', 'Precision', 'Recall', 'F1-Score', 'AUC-ROC'],
         'Value': [accuracy, precision, recall, f1, auc_roc]
     })
-    st.write("### Detailed Metrics Table")
+    st.write("### Model Performance Metrics Table")
     st.dataframe(metrics_df)
 
     # Optional: Visualize the predictions vs actual
