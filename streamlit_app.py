@@ -33,6 +33,8 @@ from sklearn.feature_selection import SelectFromModel, SelectKBest, chi2
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.preprocessing import label_binarize
+
 
 
 
@@ -694,33 +696,29 @@ with st.expander('Dataset Previews (Train Vs Test)'):
 
 st.header("Step 3: Data Splitting Comparison")
 
-# Define split ratios to compare
 ratios = [0.1, 0.15, 0.2, 0.25, 0.3]
 results = []
 
-# Train a simple classifier for each ratio and evaluate performance
 for ratio in ratios:
-    # Split the data
-    X_train, X_test, y_train, y_test = train_test_split(
-        X_final, y, test_size=ratio, random_state=42
-    )
-
-    # Train a logistic regression model (you can replace it with any classifier)
+    X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=ratio, random_state=42)
     model = LogisticRegression(max_iter=1000)
     model.fit(X_train, y_train)
 
-    # Make predictions
     y_pred = model.predict(X_test)
-    y_prob = model.predict_proba(X_test)[:, 1]  # Probabilities for ROC-AUC
+    y_prob = model.predict_proba(X_test)
 
-    # Evaluate performance
+    # Binarize labels if multi-class
+    y_test_binarized = label_binarize(y_test, classes=np.unique(y))
+
+    # Calculate metrics
     accuracy = accuracy_score(y_test, y_pred)
     precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
     recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
     f1 = f1_score(y_test, y_pred, average='weighted')
-    auc_roc = roc_auc_score(y_test, y_prob)
 
-    # Store results
+    # Handle AUC-ROC for multi-class case
+    auc_roc = roc_auc_score(y_test_binarized, y_prob, multi_class='ovr')
+
     results.append({
         'Test Size': ratio,
         'Accuracy': accuracy,
@@ -730,22 +728,11 @@ for ratio in ratios:
         'AUC-ROC': auc_roc
     })
 
-# Convert results to DataFrame
 results_df = pd.DataFrame(results)
-
-st.subheader("3.3 Comparison of Split Ratios")
-with st.expander("Show Split Ratio Results"):
-    st.dataframe(results_df)
-
-# Plot performance metrics for better visualization
-st.subheader("Performance Metrics Across Different Split Ratios")
+st.dataframe(results_df)
 st.line_chart(results_df.set_index('Test Size')[['Accuracy', 'F1-Score', 'AUC-ROC']])
-
-# Display the best split ratio based on a metric (e.g., highest F1-score)
 best_split = results_df.loc[results_df['F1-Score'].idxmax()]
-st.write(f"**Best Split Ratio:** {best_split['Test Size']} (Based on F1-Score)")
-st.write(f"Accuracy: {best_split['Accuracy']:.2f}, F1-Score: {best_split['F1-Score']:.2f}, AUC-ROC: {best_split['AUC-ROC']:.2f}")
-
+st.write(f"Best Split Ratio: {best_split['Test Size']} (F1-Score: {best_split['F1-Score']:.2f})")
 
 
 
