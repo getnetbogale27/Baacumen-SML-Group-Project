@@ -34,7 +34,9 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from sklearn.preprocessing import label_binarize
-
+from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, ConfusionMatrixDisplay
+)
 
 
 
@@ -779,8 +781,8 @@ with st.expander("⚙️ View Model Performance Comparison Across Models", expan
         'Logistic Regression': LogisticRegression(max_iter=1000),
         'Decision Tree': DecisionTreeClassifier(),
         'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
-        'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42),
-        'Support Vector Machine': SVC(probability=True)  # Add SVM here
+        'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42)
+        # 'Support Vector Machine': SVC(probability=True)  # Add SVM here
     }
 
     # Define the best split ratio
@@ -824,6 +826,16 @@ with st.expander("⚙️ View Model Performance Comparison Across Models", expan
             'AUC-ROC': auc_roc
         })
 
+        # Compute and display confusion matrix
+        cm = confusion_matrix(y_test, y_pred)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=model.classes_)
+
+        # Plot the confusion matrix
+        fig, ax = plt.subplots()
+        disp.plot(ax=ax, colorbar=False)
+        st.write(f"### Confusion Matrix for {model_name}")
+        st.pyplot(fig)
+
     # Convert results into a DataFrame
     results_df = pd.DataFrame(results)
 
@@ -847,7 +859,6 @@ with st.expander("⚙️ View Model Performance Comparison Across Models", expan
         f"**Best Model:** {best_model['Model']} "
         f"(F1-Score: {best_model['F1-Score']:.2f})"
     )
-
 
 
 
