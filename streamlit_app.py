@@ -697,7 +697,7 @@ with st.expander('Dataset Previews (Train Vs Test)'):
 st.header("Step 3: Data Splitting Comparison")
 
 # Initialize the expander
-with st.expander("View Model Performance Across Different Split Ratios", expanded=True):
+with st.expander("⚙️ View Model Performance Across Different Split Ratios", expanded=False):
 
     # Define the different ratios to test
     ratios = [0.1, 0.15, 0.2, 0.25, 0.3]
@@ -705,7 +705,9 @@ with st.expander("View Model Performance Across Different Split Ratios", expande
 
     # Iterate over each ratio to train and evaluate the model
     for ratio in ratios:
-        X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=ratio, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X_final, y, test_size=ratio, random_state=42
+        )
         model = LogisticRegression(max_iter=1000)
         model.fit(X_train, y_train)
 
@@ -713,15 +715,18 @@ with st.expander("View Model Performance Across Different Split Ratios", expande
         y_pred = model.predict(X_test)
         y_prob = model.predict_proba(X_test)
 
-        # Binarize labels for multi-class AUC-ROC calculation
-        y_test_binarized = label_binarize(y_test, classes=np.unique(y))
+        # Binarize labels only if multi-class
+        if len(np.unique(y)) > 2:
+            y_test_binarized = label_binarize(y_test, classes=np.unique(y))
+            auc_roc = roc_auc_score(y_test_binarized, y_prob, multi_class='ovr')
+        else:
+            auc_roc = roc_auc_score(y_test, y_prob[:, 1])
 
         # Calculate metrics
         accuracy = accuracy_score(y_test, y_pred)
         precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
         recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
         f1 = f1_score(y_test, y_pred, average='weighted')
-        auc_roc = roc_auc_score(y_test_binarized, y_prob, multi_class='ovr')
 
         # Store the results
         results.append({
@@ -756,7 +761,6 @@ with st.expander("View Model Performance Across Different Split Ratios", expande
         f"**Best Split Ratio:** {best_split['Test Size']} "
         f"(F1-Score: {best_split['F1-Score']:.2f})"
     )
-
 
 
 
