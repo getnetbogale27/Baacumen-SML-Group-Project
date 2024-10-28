@@ -39,6 +39,12 @@ from sklearn.preprocessing import label_binarize
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, ConfusionMatrixDisplay
 )
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 
 
 
@@ -371,9 +377,6 @@ def plot_data(df, columns, plot_type='count'):
 
     plt.tight_layout()
     st.pyplot(fig)  # Use Streamlit's pyplot
-
-# Load your data
-# df = pd.read_csv('your_data.csv')  # Replace with your actual data source
 
 # List of categorical columns
 categorical_columns = [
@@ -773,7 +776,7 @@ st.subheader("4.1 Algorithm Selection and Model Training and Performance Metrics
 # st.info("💡 Hint: The best split ratio is **25% test size / 75% train size** for this dataset.")
 
 # Initialize the expander
-with st.expander("⚙️ View Model Performance Comparison Across Models", expanded=False):
+with st.expander("⚙️ View Model Performance Comparison Across ML Models", expanded=False):
 
     # Define models to train
     models = {
@@ -852,55 +855,52 @@ with st.expander("⚙️ View Model Performance Comparison Across Models", expan
 
 
 
-# st.subheader("4.2 Hyperparameter Tuning with Random Forest")
-# # Initialize the expander
-# with st.expander("⚙️ Hyperparameter Tuning for Gradient Boosting", expanded=False):
-#     # Split the dataset again with the best ratio
-#     X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=0.25, random_state=42)
+st.subheader("4.2 Hyperparameter Tuning with Random Forest")
+# Initialize the expander
+with st.expander("⚙️ Hyperparameter Tuning for Gradient Boosting", expanded=False):
+    # Split the dataset again with the best ratio
+    X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=0.25, random_state=42)
 
-#     # Define the model
-#     gb_model = GradientBoostingClassifier()
+    # Define the model
+    gb_model = GradientBoostingClassifier()
 
-#     # Define the hyperparameters to tune
-#     param_grid = {
-#         'n_estimators': [50, 100, 150],
-#         'learning_rate': [0.01, 0.05, 0.1],
-#         'max_depth': [3, 4, 5],
-#         'min_samples_split': [2, 5, 10]
-#     }
+    # Define the hyperparameters to tune
+    param_grid = {
+        'n_estimators': [50, 100, 150],
+        'learning_rate': [0.01, 0.05, 0.1],
+        'max_depth': [3, 4, 5],
+        'min_samples_split': [2, 5, 10]
+    }
 
-#     # Perform Grid Search
-#     grid_search = GridSearchCV(estimator=gb_model, param_grid=param_grid, scoring='f1_weighted', cv=5, verbose=1)
-#     grid_search.fit(X_train, y_train)
+    # Perform Grid Search
+    grid_search = GridSearchCV(estimator=gb_model, param_grid=param_grid, scoring='f1_weighted', cv=5, verbose=1)
+    grid_search.fit(X_train, y_train)
 
-#     # Get the best model and parameters
-#     best_model = grid_search.best_estimator_
-#     best_params = grid_search.best_params_
+    # Get the best model and parameters
+    best_model = grid_search.best_estimator_
+    best_params = grid_search.best_params_
 
-#     # Make predictions on the test set
-#     y_pred = best_model.predict(X_test)
+    # Make predictions on the test set
+    y_pred = best_model.predict(X_test)
 
-#     # Display results
-#     st.write("### Best Hyperparameters")
-#     st.json(best_params)
+    # Display results
+    st.write("### Best Hyperparameters")
+    st.json(best_params)
 
-#     st.write("### Classification Report")
-#     st.text(classification_report(y_test, y_pred))
+    st.write("### Classification Report")
+    st.text(classification_report(y_test, y_pred))
 
-#     st.write("### Confusion Matrix")
-#     conf_matrix = confusion_matrix(y_test, y_pred)
-#     st.write(conf_matrix)
+    st.write("### Confusion Matrix")
+    conf_matrix = confusion_matrix(y_test, y_pred)
+    st.write(conf_matrix)
 
-#     # Optionally, you can visualize the confusion matrix
-#     import seaborn as sns
-#     import matplotlib.pyplot as plt
-
-#     plt.figure(figsize=(8, 6))
-#     sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=np.unique(y), yticklabels=np.unique(y))
-#     plt.xlabel('Predicted')
-#     plt.ylabel('Actual')
-#     plt.title('Confusion Matrix')
-#     st.pyplot(plt)
+    # Visualize the confusion matrix
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=np.unique(y), yticklabels=np.unique(y))
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.title('Confusion Matrix')
+    st.pyplot(plt)
 
 
 
@@ -914,7 +914,7 @@ with st.expander("⚙️ K-Fold Cross-Validation", expanded=False):
     gb_model = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=4, min_samples_split=2)
 
     # Perform k-fold cross-validation
-    k = 5  # You can adjust k as needed
+    k = 5  # We can adjust k as needed
     cv_scores = cross_val_score(gb_model, X_train, y_train, cv=k, scoring='f1_weighted')
 
     # Display results
@@ -923,7 +923,7 @@ with st.expander("⚙️ K-Fold Cross-Validation", expanded=False):
     st.write(f"Mean F1-Score: {cv_scores.mean():.4f}")
     st.write(f"Standard Deviation: {cv_scores.std():.4f}")
 
-    # Optionally, you can visualize the scores
+    # Optionally, we can visualize the scores
     import matplotlib.pyplot as plt
 
     plt.figure(figsize=(8, 4))
