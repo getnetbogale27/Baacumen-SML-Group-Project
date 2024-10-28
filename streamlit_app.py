@@ -770,7 +770,7 @@ with st.expander("⚙️ View Model Performance Across Different Split Ratios", 
 
 
 st.header("Step 4: Model Building")
-st.subheader("4.1 Algorithm Selection")
+st.subheader("4.1 Algorithm Selection and Model Training and Performance Metrics")
 
 # Provide a hint for the best split ratio
 # st.info("💡 Hint: The best split ratio is **25% test size / 75% train size** for this dataset.")
@@ -851,6 +851,59 @@ with st.expander("⚙️ View Model Performance Comparison Across Models", expan
         f"**Best Model:** {best_model['Model']} "
         f"(F1-Score: {best_model['F1-Score']:.2f})"
     )
+
+
+
+
+st.subheader("4.2 Hyperparameter Tuning with Random Forest")
+# Initialize the expander
+with st.expander("⚙️ Hyperparameter Tuning for Gradient Boosting", expanded=False):
+    # Split the dataset again with the best ratio
+    X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=0.25, random_state=42)
+
+    # Define the model
+    gb_model = GradientBoostingClassifier()
+
+    # Define the hyperparameters to tune
+    param_grid = {
+        'n_estimators': [50, 100, 150],
+        'learning_rate': [0.01, 0.05, 0.1],
+        'max_depth': [3, 4, 5],
+        'min_samples_split': [2, 5, 10]
+    }
+
+    # Perform Grid Search
+    grid_search = GridSearchCV(estimator=gb_model, param_grid=param_grid, scoring='f1_weighted', cv=5, verbose=1)
+    grid_search.fit(X_train, y_train)
+
+    # Get the best model and parameters
+    best_model = grid_search.best_estimator_
+    best_params = grid_search.best_params_
+
+    # Make predictions on the test set
+    y_pred = best_model.predict(X_test)
+
+    # Display results
+    st.write("### Best Hyperparameters")
+    st.json(best_params)
+
+    st.write("### Classification Report")
+    st.text(classification_report(y_test, y_pred))
+
+    st.write("### Confusion Matrix")
+    conf_matrix = confusion_matrix(y_test, y_pred)
+    st.write(conf_matrix)
+
+    # Optionally, you can visualize the confusion matrix
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=np.unique(y), yticklabels=np.unique(y))
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.title('Confusion Matrix')
+    st.pyplot(plt)
 
 
 
