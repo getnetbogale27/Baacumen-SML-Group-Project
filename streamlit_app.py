@@ -1048,7 +1048,7 @@ def encode_inputs(X_columns):
 X_columns = X_final.columns
 
 # Prepare the input data
-input_data = encode_inputs(X_columns)
+# input_data = encode_inputs(X_columns)
 
 # Predict and display results when button is clicked
 if st.button('👉 Click Me to Churn Risk Score'):
