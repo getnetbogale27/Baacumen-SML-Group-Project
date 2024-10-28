@@ -769,6 +769,8 @@ with st.expander("⚙️ View Model Performance Across Different Split Ratios", 
 st.header("Step 4: Model Building")
 st.subheader("4.1 Algorithm Selection")
 
+# Provide a hint for the best split ratio
+st.info("💡 Hint: The best split ratio is **25% test size / 75% train size** for this dataset.")
 # Initialize the expander
 with st.expander("⚙️ View Model Performance Comparison Across Models", expanded=False):
 
@@ -777,7 +779,8 @@ with st.expander("⚙️ View Model Performance Comparison Across Models", expan
         'Logistic Regression': LogisticRegression(max_iter=1000),
         'Decision Tree': DecisionTreeClassifier(),
         'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
-        'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42)
+        'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42),
+        'Support Vector Machine (SVM)': SVC(probability=True, random_state=42)
     }
 
     # Define the best split ratio
@@ -845,81 +848,6 @@ with st.expander("⚙️ View Model Performance Comparison Across Models", expan
         f"(F1-Score: {best_model['F1-Score']:.2f})"
     )
 
-
-
-
-
-
-# Provide a hint for the best split ratio
-st.info("💡 Hint: The best split ratio is **25% test size / 75% train size** for this dataset.")
-
-# Expander for Algorithm Selection and Model Performance
-with st.expander("⚙️ Train Model and View Performance", expanded=True):
-
-    # Select the algorithm
-    algorithm = st.selectbox(
-        "Choose the Machine Learning Algorithm:",
-        ("Logistic Regression", "Decision Tree", "Random Forest", "Gradient Boosting")
-    )
-
-    # Pre-select 0.25 as the default test size (Best Split Ratio)
-    test_size = st.slider("Select Test Size", 0.1, 0.3, value=0.25, step=0.05)
-
-    # Train-Test Split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X_final, y, test_size=test_size, random_state=42
-    )
-
-    # Initialize the selected model
-    if algorithm == "Logistic Regression":
-        model = LogisticRegression(max_iter=1000)
-    elif algorithm == "Decision Tree":
-        model = DecisionTreeClassifier(random_state=42)
-    elif algorithm == "Random Forest":
-        model = RandomForestClassifier(random_state=42)
-    elif algorithm == "Gradient Boosting":
-        model = GradientBoostingClassifier(random_state=42)
-
-    # Train the model
-    model.fit(X_train, y_train)
-
-    # Make predictions
-    y_pred = model.predict(X_test)
-    y_prob = model.predict_proba(X_test)
-
-    # Handle AUC-ROC for binary or multi-class
-    if len(np.unique(y)) > 2:
-        y_test_binarized = label_binarize(y_test, classes=np.unique(y))
-        auc_roc = roc_auc_score(y_test_binarized, y_prob, multi_class='ovr')
-    else:
-        auc_roc = roc_auc_score(y_test, y_prob[:, 1])
-
-    # Calculate performance metrics
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
-    recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
-    f1 = f1_score(y_test, y_pred, average='weighted')
-
-    # # Display performance metrics
-    # st.write("### Model Performance Metrics")
-    # st.metric("Accuracy", f"{accuracy:.6f}")
-    # st.metric("Precision", f"{precision:.6f}")
-    # st.metric("Recall", f"{recall:.6f}")
-    # st.metric("F1-Score", f"{f1:.6f}")
-    # st.metric("AUC-ROC", f"{auc_roc:.6f}")
-
-    # Display detailed metrics in a table
-    metrics_df = pd.DataFrame({
-        'Metric': ['Accuracy', 'Precision', 'Recall', 'F1-Score', 'AUC-ROC'],
-        'Value': [accuracy, precision, recall, f1, auc_roc]
-    })
-    st.write("### Model Performance Metrics Table")
-    st.dataframe(metrics_df)
-
-    # Optional: Visualize the predictions vs actual
-    st.write("### Confusion Matrix")
-    conf_matrix = pd.crosstab(y_test, y_pred, rownames=['Actual'], colnames=['Predicted'])
-    st.write(conf_matrix)
 
 
 
