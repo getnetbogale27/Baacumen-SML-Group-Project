@@ -939,9 +939,7 @@ with st.expander("⚙️ K-Fold Cross-Validation", expanded=False):
 
 
 
-
-
-# function to convert minutes to HH:MM:SS format
+# Function to convert minutes to HH:MM:SS format
 def minutes_to_time(minutes):
     hours = minutes // 60
     mins = minutes % 60
@@ -998,33 +996,7 @@ with st.sidebar:
 if st.button('Submit'):
     st.write('Input features submitted successfully!')
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#Split data for training and testing
-# X_final = pd.concat([X_normalized, X_encoded], axis=1)
-# y = df['Nutrition_Status']  # Target (dependent variable)
-# X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=0.25, random_state=42)
-
-# Cache the model training
-
-
-# Split the data
+# Split the data (make sure to define X_final and y before this)
 X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=0.25, random_state=42)
 
 # Cache the model training
@@ -1034,12 +1006,12 @@ def train_model(X_train, y_train):
     model.fit(X_train, y_train)
     return model
 
-# Train the model
-model = train_model(X_train, y_train)
+# Train the model with a spinner
+with st.spinner('Training the model...'):
+    model = train_model(X_train, y_train)
 
 # Prepare input data function
 def encode_inputs(X_columns):
-    # Example input collection using Streamlit's number_input
     input_values = [st.number_input(f'{col}', key=col) for col in X_columns]
     input_data = np.array(input_values).reshape(1, -1)  # Reshape for prediction
     return input_data
@@ -1048,43 +1020,20 @@ def encode_inputs(X_columns):
 X_columns = X_final.columns
 
 # Prepare the input data
-# input_data = encode_inputs(X_columns)
+input_data = encode_inputs(X_columns)
 
 # Predict and display results when button is clicked
 if st.button('👉 Click Me to Churn Risk Score'):
-    # Predict probabilities for each class
-    prediction_proba = model.predict_proba(input_data)[0]
+    with st.spinner('Calculating churn risk...'):
+        # Predict probabilities for each class
+        prediction_proba = model.predict_proba(input_data)[0]
 
-    # Predicted Probabilities Expander
-    with st.expander('📊 Predicted Probabilities'):
-        st.subheader('Predicted Probabilities')
-
-        # Define the category labels as numbers from 1 to 5
-        categories = [1, 2, 3, 4, 5]
-
-        # Create DataFrame for displaying probabilities
-        df_prediction_proba = pd.DataFrame({
-            'Category': categories,
-            'Probability': prediction_proba
-        })
-
-        # Display probabilities using Streamlit's dataframe component
-        st.dataframe(
-            df_prediction_proba,
-            column_config={
-                'Category': st.column_config.TextColumn('Category', width='medium'),
-                'Probability': st.column_config.ProgressColumn(
-                    'Probability', format='%f', width='medium', min_value=0, max_value=1
-                )
-            },
-            hide_index=True
-        )
+        # Displaying as a bar chart
+        st.bar_chart(prediction_proba, use_container_width=True)
 
         # Display the predicted category with the highest probability
-        predicted_category = categories[np.argmax(prediction_proba)]
+        predicted_category = np.argmax(prediction_proba) + 1  # Assuming categories start from 1
         st.success(f'Predicted Category: {predicted_category}')
-
-
 
 
 
