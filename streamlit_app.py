@@ -1010,11 +1010,11 @@ def train_model(X_train, y_train):
 with st.spinner('Training the model...'):
     model = train_model(X_train, y_train)
 
-# Prepare input data function
-def encode_inputs(X_columns):
-    input_values = [st.number_input(f'{col}', key=col) for col in X_columns]
-    input_data = np.array(input_values).reshape(1, -1)  # Reshape for prediction
-    return input_data
+# # Prepare input data function
+# def encode_inputs(X_columns):
+#     input_values = [st.number_input(f'{col}', key=col) for col in X_columns]
+#     input_data = np.array(input_values).reshape(1, -1)  # Reshape for prediction
+#     return input_data
 
 # Get the columns from your final dataset
 X_columns = X_final.columns
