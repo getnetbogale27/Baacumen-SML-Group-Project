@@ -1,49 +1,49 @@
-# Step 1: Import necessary packages and dataset
+# System and I/O utilities
 import os
-import streamlit as st
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.svm import SVC 
-from sklearn.metrics import accuracy_score, classification_report
-from sklearn.linear_model import LogisticRegression, Lasso, RidgeClassifier, ElasticNet
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import label_binarize
-import matplotlib.pyplot as plt
-from sklearn.model_selection import cross_val_score
-import seaborn as sns
-from sklearn.metrics import roc_curve, auc
-import numpy as np
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_auc_score
-import scipy.stats as stats
 from io import StringIO
-from sklearn.preprocessing import LabelEncoder 
-from sklearn.ensemble import ExtraTreesRegressor
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.feature_selection import RFE, SelectKBest, f_classif, VarianceThreshold
-from sklearn.linear_model import LassoCV
-from boruta import BorutaPy
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.metrics import accuracy_score, classification_report
-from sklearn.feature_selection import SelectKBest, chi2
-from sklearn.feature_selection import SelectFromModel, SelectKBest, chi2
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
-from sklearn.preprocessing import label_binarize
-from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, ConfusionMatrixDisplay
-)
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.metrics import classification_report, confusion_matrix
-import seaborn as sns
+
+# Core libraries
+import numpy as np
+import pandas as pd
+import scipy.stats as stats
+
+# Visualization
 import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Streamlit for app interface
+import streamlit as st
+
+# Scikit-learn: Model selection, preprocessing, and metrics
+from sklearn.model_selection import (
+    train_test_split, cross_val_score, GridSearchCV
+)
+from sklearn.preprocessing import (
+    StandardScaler, MinMaxScaler, OneHotEncoder, LabelEncoder, label_binarize
+)
+from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, 
+    classification_report, confusion_matrix, roc_curve, auc, ConfusionMatrixDisplay
+)
+
+# Scikit-learn: Models and feature selection
+from sklearn.ensemble import (
+    RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, 
+    GradientBoostingClassifier
+)
+from sklearn.linear_model import (
+    LogisticRegression, Lasso, LassoCV, RidgeClassifier, ElasticNet
+)
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import (
+    RFE, SelectKBest, f_classif, chi2, VarianceThreshold, SelectFromModel
+)
+
+# Boruta for feature selection
+from boruta import BorutaPy
 
 
 
