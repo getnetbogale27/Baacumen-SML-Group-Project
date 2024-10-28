@@ -677,7 +677,7 @@ for ratio in ratios:
 selected_dataset = list(datasets.keys())[0]  # Default selection for training set
 
 # Display both training and testing datasets in one expander
-with st.expander('Dataset Previews (Train Vs Test)'):
+with st.expander('🧪 Dataset Previews (Train Vs Test)'):
     # Allow user to select a dataset to view
     selected_dataset = st.selectbox('Select a training dataset here to display the test data automatically displayed:', list(datasets.keys()))
     
@@ -694,7 +694,7 @@ with st.expander('Dataset Previews (Train Vs Test)'):
 
 
 
-st.header("Step 3: Data Splitting Comparison")
+# st.header("Step 3: Data Splitting Comparison")
 
 # Initialize the expander
 with st.expander("⚙️ View Model Performance Across Different Split Ratios", expanded=False):
@@ -769,6 +769,70 @@ with st.expander("⚙️ View Model Performance Across Different Split Ratios", 
 st.header("Step 4: Model Building")
 st.subheader("4.1 Algorithm Selection")
 
+# Select the algorithm
+algorithm = st.selectbox(
+    "Choose the Machine Learning Algorithm:",
+    ("Logistic Regression", "Decision Tree", "Random Forest", "Gradient Boosting")
+)
+
+# Define the test size for train-test split
+test_size = st.slider("Select Test Size", 0.1, 0.3, step=0.05)
+
+# Train-Test Split
+X_train, X_test, y_train, y_test = train_test_split(
+    X_final, y, test_size=test_size, random_state=42
+)
+
+# Initialize the selected model
+if algorithm == "Logistic Regression":
+    model = LogisticRegression(max_iter=1000)
+elif algorithm == "Decision Tree":
+    model = DecisionTreeClassifier(random_state=42)
+elif algorithm == "Random Forest":
+    model = RandomForestClassifier(random_state=42)
+elif algorithm == "Gradient Boosting":
+    model = GradientBoostingClassifier(random_state=42)
+
+# Train the model
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+y_prob = model.predict_proba(X_test)
+
+# Handle AUC-ROC for binary or multi-class
+if len(np.unique(y)) > 2:
+    y_test_binarized = label_binarize(y_test, classes=np.unique(y))
+    auc_roc = roc_auc_score(y_test_binarized, y_prob, multi_class='ovr')
+else:
+    auc_roc = roc_auc_score(y_test, y_prob[:, 1])
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
+recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
+f1 = f1_score(y_test, y_pred, average='weighted')
+
+# Display performance metrics
+st.write("### Model Performance Metrics")
+st.metric("Accuracy", f"{accuracy:.6f}")
+st.metric("Precision", f"{precision:.6f}")
+st.metric("Recall", f"{recall:.6f}")
+st.metric("F1-Score", f"{f1:.6f}")
+st.metric("AUC-ROC", f"{auc_roc:.6f}")
+
+# Display detailed metrics in a table
+metrics_df = pd.DataFrame({
+    'Metric': ['Accuracy', 'Precision', 'Recall', 'F1-Score', 'AUC-ROC'],
+    'Value': [accuracy, precision, recall, f1, auc_roc]
+})
+st.write("### Detailed Metrics Table")
+st.dataframe(metrics_df)
+
+# Optional: Visualize the predictions vs actual
+st.write("### Confusion Matrix")
+conf_matrix = pd.crosstab(y_test, y_pred, rownames=['Actual'], colnames=['Predicted'])
+st.write(conf_matrix)
 
 
 
