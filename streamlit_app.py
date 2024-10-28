@@ -773,7 +773,8 @@ st.header("Step 4: Model Building")
 st.subheader("4.1 Algorithm Selection")
 
 # Provide a hint for the best split ratio
-st.info("💡 Hint: The best split ratio is **25% test size / 75% train size** for this dataset.")
+# st.info("💡 Hint: The best split ratio is **25% test size / 75% train size** for this dataset.")
+
 # Initialize the expander
 with st.expander("⚙️ View Model Performance Comparison Across Models", expanded=False):
 
@@ -783,7 +784,7 @@ with st.expander("⚙️ View Model Performance Comparison Across Models", expan
         'Decision Tree': DecisionTreeClassifier(),
         'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
         'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42),
-        'Support Vector Machine': SVC(probability=True)  # Add SVM here
+        'Support Vector Machine': SVC(probability=True)  # Enable probability estimates
     }
 
     # Define the best split ratio
@@ -826,16 +827,6 @@ with st.expander("⚙️ View Model Performance Comparison Across Models", expan
             'F1-Score': f1,
             'AUC-ROC': auc_roc
         })
-
-        # Compute and display confusion matrix
-        cm = confusion_matrix(y_test, y_pred)
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=model.classes_)
-
-        # Plot the confusion matrix
-        fig, ax = plt.subplots()
-        disp.plot(ax=ax, colorbar=False)
-        st.write(f"### Confusion Matrix for {model_name}")
-        st.pyplot(fig)
 
     # Convert results into a DataFrame
     results_df = pd.DataFrame(results)
