@@ -4,6 +4,7 @@ import streamlit as st
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC 
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.linear_model import LogisticRegression, Lasso, RidgeClassifier, ElasticNet
 from sklearn.ensemble import RandomForestClassifier
@@ -781,8 +782,8 @@ with st.expander("⚙️ View Model Performance Comparison Across Models", expan
         'Logistic Regression': LogisticRegression(max_iter=1000),
         'Decision Tree': DecisionTreeClassifier(),
         'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
-        'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42)
-        # 'Support Vector Machine': SVC(probability=True)  # Add SVM here
+        'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42),
+        'Support Vector Machine': SVC(probability=True)  # Add SVM here
     }
 
     # Define the best split ratio
