@@ -733,16 +733,29 @@ with st.expander("View Model Performance Across Different Split Ratios", expande
             'AUC-ROC': auc_roc
         })
 
-    # Display the results in a DataFrame
+    # Convert results into a DataFrame
     results_df = pd.DataFrame(results)
-    st.dataframe(results_df)
+
+    # Display the DataFrame in Streamlit
+    st.write("### Model Performance Table")
+    st.dataframe(results_df.style.format({
+        'Accuracy': '{:.6f}',
+        'Precision': '{:.6f}',
+        'Recall': '{:.6f}',
+        'F1-Score': '{:.6f}',
+        'AUC-ROC': '{:.6f}'
+    }))
 
     # Plot the metrics across different split ratios
+    st.write("### Performance Metrics Chart")
     st.line_chart(results_df.set_index('Test Size')[['Accuracy', 'F1-Score', 'AUC-ROC']])
 
     # Find the best split based on F1-Score
     best_split = results_df.loc[results_df['F1-Score'].idxmax()]
-    st.write(f"Best Split Ratio: {best_split['Test Size']} (F1-Score: {best_split['F1-Score']:.2f})")
+    st.write(
+        f"**Best Split Ratio:** {best_split['Test Size']} "
+        f"(F1-Score: {best_split['F1-Score']:.2f})"
+    )
 
 
 
