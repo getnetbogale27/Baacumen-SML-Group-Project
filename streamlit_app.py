@@ -855,7 +855,7 @@ with st.expander("⚙️ View Model Performance Comparison Across ML Models", ex
 
 
 
-st.subheader("4.2 Hyperparameter Tuning with Random Forest")
+st.subheader("4.2 Hyperparameter Tuning with Gradient Boosting Classifier")
 # Initialize the expander
 with st.expander("⚙️ Hyperparameter Tuning for Gradient Boosting", expanded=False):
     # Split the dataset again with the best ratio
