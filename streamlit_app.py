@@ -1016,11 +1016,11 @@ def encode_inputs(X_columns):
     input_data = np.array(input_values).reshape(1, -1)
     return input_data
 
-# Get the columns from your final dataset
+# Get the columns from our final dataset
 X_columns = X_final.columns
 
 # Prepare the input data
-input_data = encode_inputs(X_columns)
+# input_data = encode_inputs(X_columns)
 
 # Predict and display results when button is clicked
 if st.button('👉 Click Me to Calculate Churn Risk Score'):
