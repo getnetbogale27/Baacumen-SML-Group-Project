@@ -770,7 +770,7 @@ with st.expander("⚙️ Data Splitting Comparison", expanded=False):
 
 
 st.header("Step 4: Model Building")
-st.subheader("4.1 Algorithm Selection and Model Training and Performance Metrics")
+st.subheader("4.1 Algorithm Selection, Model Training and Performance Metrics")
 
 # Provide a hint for the best split ratio
 # st.info("💡 Hint: The best split ratio is **25% test size / 75% train size** for this dataset.")
@@ -856,6 +856,11 @@ with st.expander("⚙️ View Model Performance Comparison Across ML Models", ex
 
 
 st.subheader("4.2 Hyperparameter Tuning with Gradient Boosting Classifier")
+    st.info(
+        "📌 **Remark:**\n"
+        "Due to the limitations of the current system's performance, the hyperparameter tuning code has been commented out. "
+        "We tested this tuning process on a smaller dataset, and it performed successfully."
+    )
 # # Initialize the expander
 # with st.expander("⚙️ Hyperparameter Tuning for Gradient Boosting", expanded=False):
 #     # Split the dataset again with the best ratio
@@ -1010,16 +1015,16 @@ def train_model(X_train, y_train):
 with st.spinner('Training the model...'):
     model = train_model(X_train, y_train)
 
-# Prepare input data function
-def encode_inputs(X_columns):
-    input_values = [st.number_input(f'{col}', key=col) for col in X_columns]
-    input_data = np.array(input_values).reshape(1, -1)
-    return input_data
+# # Prepare input data function
+# def encode_inputs(X_columns):
+#     input_values = [st.number_input(f'{col}', key=col) for col in X_columns]
+#     input_data = np.array(input_values).reshape(1, -1)
+#     return input_data
 
-# Get the columns from our final dataset
-X_columns = X_final.columns
+# # Get the columns from our final dataset
+# X_columns = X_final.columns
 
-# Prepare the input data
+# # Prepare the input data
 # input_data = encode_inputs(X_columns)
 
 # Predict and display results when button is clicked
