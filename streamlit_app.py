@@ -856,11 +856,11 @@ with st.expander("⚙️ View Model Performance Comparison Across ML Models", ex
 
 
 st.subheader("4.2 Hyperparameter Tuning with Gradient Boosting Classifier")
-    st.info(
-        "📌 **Remark:**\n"
-        "Due to the limitations of the current system's performance, the hyperparameter tuning code has been commented out. "
-        "We tested this tuning process on a smaller dataset, and it performed successfully."
-    )
+st.info(
+    "📌 **Remark:**\n"
+    "Due to the limitations of the current system's performance, the hyperparameter tuning code has been commented out. "
+    "We tested this tuning process on a smaller dataset, and it performed successfully."
+)
 # # Initialize the expander
 # with st.expander("⚙️ Hyperparameter Tuning for Gradient Boosting", expanded=False):
 #     # Split the dataset again with the best ratio
