@@ -955,6 +955,7 @@ with st.sidebar:
     st.header('Top Input Features')
 
     # Input fields for the top features
+    gender = st.selectbox('Gender', ['F', 'M'], index=0)
     membership_category = st.selectbox('Membership Category', [
         'Platinum Membership', 'Premium Membership', 'No Membership', 
         'Gold Membership', 'Silver Membership', 'Basic Membership'], index=0)
