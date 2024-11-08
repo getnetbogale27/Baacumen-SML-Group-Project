@@ -981,8 +981,25 @@ with st.sidebar:
     age = st.number_input('Age', min_value=18, max_value=100, value=30, step=1)
     
     # Slider for average engagement score
-    avg_engagement_score = st.slider('Average Engagement Score', 0.0,
-
+    avg_engagement_score = st.slider('Average Engagement Score', 0.0, 100.0, 50.0, step=0.1)
+    
+    # Slider for average time spent (in minutes)
+    avg_time_spent = st.slider('Average Time Spent', -2096.58, 2732.70, 0.0, step=0.01)
+    
+    # Selectbox for feedback
+    feedback = st.selectbox('Feedback', [
+        'Products always in Stock', 'Quality Customer Care', 'Poor Website', 
+        'No reason specified', 'Poor Product Quality', 'Too many ads', 
+        'User Friendly Website', 'Poor Customer Service', 'Reasonable Price'], index=0)
+    
+    # Slider for recency (days since last interaction)
+    recency = st.slider('Recency (Days Since Last Interaction)', 0, 365, 30, step=1)
+    
+    # Slider for days since last login
+    days_since_last_login = st.slider('Days Since Last Login', 1, 365, 13, step=1)
+    
+    # Slider for login frequency
+    login_frequency = st.slider('Login Frequency (per week)', 0.0, 7.0, 3.5, step=0.1)
 
 
 
