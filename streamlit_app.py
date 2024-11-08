@@ -950,52 +950,88 @@ def minutes_to_time(minutes):
     mins = minutes % 60
     return f"{int(hours):02}:{int(mins):02}:00"
 
-# Sidebar for input features
-with st.sidebar:
-    st.header('Input Features')
+# # Sidebar for input features
+# with st.sidebar:
+#     st.header('Input Features')
 
-    # Input fields
-    gender = st.selectbox('Gender', ['F', 'M'], index=0)
-    region_category = st.selectbox('Region Category', ['Village', 'City', 'Town'], index=0)
+#     # Input fields
+#     gender = st.selectbox('Gender', ['F', 'M'], index=0)
+#     region_category = st.selectbox('Region Category', ['Village', 'City', 'Town'], index=0)
+#     membership_category = st.selectbox('Membership Category', [
+#         'Platinum Membership', 'Premium Membership', 'No Membership', 
+#         'Gold Membership', 'Silver Membership', 'Basic Membership'], index=0)
+
+#     joining_date = st.date_input(
+#         'Joining Date', value=pd.to_datetime('2015-01-01'),
+#         min_value=pd.to_datetime('2015-01-01'),
+#         max_value=pd.to_datetime('2017-12-31'))
+
+#     joined_through_referral = st.selectbox('Joined through Referral', ['Yes', 'No'], index=0)
+#     preferred_offer_types = st.selectbox('Preferred Offer Types', [
+#         'Gift Vouchers/Coupons', 'Credit/Debit Card Offers', 'Without Offers'], index=0)
+    
+#     medium_of_operation = st.selectbox('Medium of Operation', ['Both', 'Desktop', 'Smartphone'], index=0)
+#     internet_option = st.selectbox('Internet Option', ['Wi-Fi', 'Mobile_Data', 'Fiber_Optic'], index=0)
+
+#     # Slider for last visit time (in minutes)
+#     last_visit_minutes = st.slider(
+#         'Last Visit Time in Minute', min_value=0, max_value=24 * 60 - 1, value=12 * 60, step=1
+#     )
+#     last_visit_time = minutes_to_time(last_visit_minutes)
+
+#     days_since_last_login = st.slider('Days Since Last Login', 1, 26, 13, step=1)
+#     avg_time_spent = st.slider('Average Time Spent', -2096.58, 2732.70, 0.0, step=0.01)
+#     avg_transaction_value = st.slider('Average Transaction Value', 806.22, 99805.52, 5000.0, step=0.01)
+#     avg_frequency_login_days = st.slider('Average Frequency of Login Days', -43.65, 73.06, 0.0, step=0.01)
+#     points_in_wallet = st.slider('Points in Wallet', -549.36, 1755.09, 0.0, step=0.01)
+
+#     used_special_discount = st.selectbox('Used Special Discount', ['Yes', 'No'], index=0)
+#     offer_application_preference = st.selectbox('Offer Application Preference', ['Yes', 'No'], index=0)
+#     past_complaint = st.selectbox('Past Complaint', ['Yes', 'No'], index=0)
+
+#     complaint_status = st.selectbox('Complaint Status', [
+#         'Not Applicable', 'Solved', 'Solved in Follow-up', 'Unsolved', 'No Information Available'], index=0)
+
+#     feedback = st.selectbox('Feedback', [
+#         'Products always in Stock', 'Quality Customer Care', 'Poor Website', 
+#         'No reason specified', 'Poor Product Quality', 'Too many ads', 
+#         'User Friendly Website', 'Poor Customer Service', 'Reasonable Price'], index=0)
+
+# Sidebar for top input features
+with st.sidebar:
+    st.header('Top Input Features')
+
+    # Input fields for the top features
     membership_category = st.selectbox('Membership Category', [
         'Platinum Membership', 'Premium Membership', 'No Membership', 
         'Gold Membership', 'Silver Membership', 'Basic Membership'], index=0)
 
-    joining_date = st.date_input(
-        'Joining Date', value=pd.to_datetime('2015-01-01'),
-        min_value=pd.to_datetime('2015-01-01'),
-        max_value=pd.to_datetime('2017-12-31'))
-
-    joined_through_referral = st.selectbox('Joined through Referral', ['Yes', 'No'], index=0)
-    preferred_offer_types = st.selectbox('Preferred Offer Types', [
-        'Gift Vouchers/Coupons', 'Credit/Debit Card Offers', 'Without Offers'], index=0)
+    # Slider for points utilization rate (assumed as a percentage)
+    points_utilization_rate = st.slider('Points Utilization Rate (%)', 0.0, 100.0, 50.0, step=0.1)
     
-    medium_of_operation = st.selectbox('Medium of Operation', ['Both', 'Desktop', 'Smartphone'], index=0)
-    internet_option = st.selectbox('Internet Option', ['Wi-Fi', 'Mobile_Data', 'Fiber_Optic'], index=0)
-
-    # Slider for last visit time (in minutes)
-    last_visit_minutes = st.slider(
-        'Last Visit Time in Minute', min_value=0, max_value=24 * 60 - 1, value=12 * 60, step=1
-    )
-    last_visit_time = minutes_to_time(last_visit_minutes)
-
-    days_since_last_login = st.slider('Days Since Last Login', 1, 26, 13, step=1)
-    avg_time_spent = st.slider('Average Time Spent', -2096.58, 2732.70, 0.0, step=0.01)
-    avg_transaction_value = st.slider('Average Transaction Value', 806.22, 99805.52, 5000.0, step=0.01)
-    avg_frequency_login_days = st.slider('Average Frequency of Login Days', -43.65, 73.06, 0.0, step=0.01)
+    # Slider for points in wallet
     points_in_wallet = st.slider('Points in Wallet', -549.36, 1755.09, 0.0, step=0.01)
+    
+    # Slider for average transaction value
+    avg_transaction_value = st.slider('Average Transaction Value', 806.22, 99805.52, 5000.0, step=0.01)
+    
+    # Slider for customer tenure (assumed in days here)
+    customer_tenure = st.slider('Customer Tenure (in days)', 0, 365 * 5, 365, step=1)
+    
+    # Slider for average frequency of login days
+    avg_frequency_login_days = st.slider('Average Frequency of Login Days', -43.65, 73.06, 0.0, step=0.01)
+    
+    # Slider for engagement score
+    engagement_score = st.slider('Engagement Score', 0, 100, 50, step=1)
 
-    used_special_discount = st.selectbox('Used Special Discount', ['Yes', 'No'], index=0)
-    offer_application_preference = st.selectbox('Offer Application Preference', ['Yes', 'No'], index=0)
-    past_complaint = st.selectbox('Past Complaint', ['Yes', 'No'], index=0)
+    # Input for age
+    age = st.number_input('Age', min_value=18, max_value=100, value=30, step=1)
+    
+    # Slider for average engagement score
+    avg_engagement_score = st.slider('Average Engagement Score', 0.0,
 
-    complaint_status = st.selectbox('Complaint Status', [
-        'Not Applicable', 'Solved', 'Solved in Follow-up', 'Unsolved', 'No Information Available'], index=0)
 
-    feedback = st.selectbox('Feedback', [
-        'Products always in Stock', 'Quality Customer Care', 'Poor Website', 
-        'No reason specified', 'Poor Product Quality', 'Too many ads', 
-        'User Friendly Website', 'Poor Customer Service', 'Reasonable Price'], index=0)
+
 
 # Example button to confirm input submission
 if st.button('Submit'):
