@@ -67,8 +67,7 @@ df = load_data()
 # Streamlit title and info
 st.title('🤖 Supervised ML App')
 # List of Authors
-st.write("**Authors:** Getnet B. (PhD Candidate), Bezawit B., Tadele B., "
-         "Selam S., Michael A.")
+st.write("**Authors:** Getnet B. (PhD Candidate)")
 
 st.info(
     "The primary objective of this project is to build a predictive model that calculates the Churn "
